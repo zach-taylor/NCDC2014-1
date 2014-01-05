@@ -1,6 +1,6 @@
 # ISU NCDC 2014 WebApp
 
-This is the web app for the Spring 2014 ISU National Cyber Defense Compeition.  It is designed to be intentially insecure and should not be used in any production system.
+This is the web app for the Spring 2014 ISU National Cyber Defense Competition.  It is designed to be intentionally insecure and should not be used in any production system.
 
 ## Prereqs
 * Originally developed on Ubuntu 12.04
