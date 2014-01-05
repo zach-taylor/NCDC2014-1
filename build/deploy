@@ -13,19 +13,12 @@ if [[ -d /var/fastcgi/templates ]]; then
   sudo rm -rf /var/fastcgi/templates
 fi
 
-if [[ -d /var/www/static ]]; then
-  sudo rm -rf /var/www/static
-fi
-
-if [[ -f /var/www/robots.txt ]]; then
-  sudo rm /var/www/robots.txt
-fi
+sudo rm -rf /var/www/*
 
 sudo cp webapp /var/fastcgi/webapp
 sudo mkdir -p /var/fastcgi/templates
 sudo cp -r ../webapp/templates/* /var/fastcgi/templates
-sudo mkdir -p /var/www/static
-sudo cp -r ../webapp/static/* /var/www/static
+sudo cp -r ../webapp/static/* /var/www
 sudo cp ../webapp/robots.txt /var/www/robots.txt
 
 if [[ -f /etc/lighttpd/conf-available/10-fastcgi.conf ]]; then
