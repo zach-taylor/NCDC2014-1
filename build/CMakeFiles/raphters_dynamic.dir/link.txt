@@ -1,1 +1,0 @@
-/usr/bin/gcc  -fPIC -g   -shared -Wl,-soname,libraphters_dynamic.so -o libraphters_dynamic.so CMakeFiles/raphters_dynamic.dir/dispatcher.c.o CMakeFiles/raphters_dynamic.dir/request.c.o CMakeFiles/raphters_dynamic.dir/response.c.o CMakeFiles/raphters_dynamic.dir/raphters.c.o -L/usr/local/lib -lfcgi -Wl,-rpath,/usr/local/lib 

@@ -1,3 +1,0 @@
-/home/cdc/Desktop/webapp/build/CMakeFiles/raphters_dynamic.dir
-/home/cdc/Desktop/webapp/build/CMakeFiles/raphters_static.dir
-/home/cdc/Desktop/webapp/build/CMakeFiles/webapp.dir
