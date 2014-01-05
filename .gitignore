@@ -1,3 +1,6 @@
+# ignore temporary files
+*~
+
 # ignore everything in bin except the deploy script
 bin/*
 !deploy
