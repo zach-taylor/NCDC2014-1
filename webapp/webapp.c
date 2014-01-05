@@ -20,19 +20,34 @@
 #include "raphters.h"
 #include "utils.h"
 
+void write_template(response *res) {
+  const char *header = "HEADER";
+  response_write(res, header);
+}
+
+void write_page_template_header(response *res){
+  const char *header = "HEADER";
+  response_write(res, header);
+}
+
+void write_page_template_footer(response *res){
+  const char *footer = "FOOTER";
+  response_write(res, footer);
+}
+
 START_HANDLER (webapp, POST, "login", res, 0, matches) {
   response_add_header(res, "content-type", "text/html");
-  //write_page_template_header(res);
+  write_page_template_header(res);
   response_write(res, "todo");
-  //write_page_template_footer(res);
+  write_page_template_footer(res);
 } END_HANDLER
 
 START_HANDLER (default_handler, GET, "", res, 0, matches) {
   response_add_header(res, "content-type", "text/html");
-  //write_page_template_header(res);
+  write_page_template_header(res);
   const char *login_form = read_file("./templates/login.html.template");
   response_write(res, login_form);
-  //write_page_template_footer(res);
+  write_page_template_footer(res);
 } END_HANDLER
 
 int main() {
@@ -40,19 +55,4 @@ int main() {
     add_handler(default_handler);
     serve_forever();
     return 0;
-}
-
-void write_template(response *res) {
-  const char *header = "HEADER";
-  response_write(res, header);
-}
-
-void write_page_template_header(response *res) {
-  const char *header = "HEADER";
-  response_write(res, header);
-}
-
-void write_page_template_footer(response *res) {
-  const char *footer = "FOOTER";
-  response_write(res, footer);
 }

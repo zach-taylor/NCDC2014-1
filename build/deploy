@@ -5,14 +5,31 @@ make
 
 sudo /etc/init.d/lighttpd stop
 
-sudo rm /var/fastcgi/webapp
-sudo rm -r /var/fastcgi/templates
-sudo rm -r /var/www/static
-sudo rm /var/www/robots.txt
+if [[ -f /var/fastcgi/webapp ]]; then
+  sudo rm /var/fastcgi/webapp
+fi
+
+if [[ -d /var/fastcgi/templates ]]; then
+  sudo rm -rf /var/fastcgi/templates
+fi
+
+if [[ -d /var/www/static ]]; then
+  sudo rm -rf /var/www/static
+fi
+
+if [[ -f /var/www/robots.txt ]]; then
+  sudo rm /var/www/robots.txt
+fi
 
 sudo cp webapp /var/fastcgi/webapp
-sudo cp -r ../webapp/templates* /var/fastcgi/templates
-sudo cp -r ../webapp/static* /var/www/static
+sudo mkdir -p /var/fastcgi/templates
+sudo cp -r ../webapp/templates/* /var/fastcgi/templates
+sudo mkdir -p /var/www/static
+sudo cp -r ../webapp/static/* /var/www/static
 sudo cp ../webapp/robots.txt /var/www/robots.txt
+
+if [[ -f /etc/lighttpd/conf-available/10-fastcgi.conf ]]; then
+  sudo cp ../10-fastcgi.conf /etc/lighttpd/conf-available/10-fastcgi.conf
+fi
 
 sudo /etc/init.d/lighttpd start

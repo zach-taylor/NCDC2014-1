@@ -29,7 +29,7 @@ handler *head = NULL;
 handler *last = NULL;
 
 void default_error_handler(const char *msg) {
-    printf("content-type: text/html\n\nerror: %s\n", msg);
+    printf("content-type: text/html\n\nError: %s\n", msg);
 }
 
 void (*error_handler)(const char *) = default_error_handler;
@@ -73,7 +73,13 @@ void dispatch() {
             free(matches);
         }
     }
-    error_handler("no match");
+
+    char err[1024] = "No match for ";
+    strcat(err, method_str);
+    strcat(err, " \"");
+    strcat(err, path_info);
+    strcat(err, "\"");
+    error_handler(err);
 }
 
 void add_handler(handler *h) {

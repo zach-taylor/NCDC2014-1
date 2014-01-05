@@ -35,7 +35,7 @@ RM = /usr/bin/cmake -E remove -f
 CMAKE_SOURCE_DIR = /home/cdc/Desktop/webapp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/cdc/Desktop/webapp/bin
+CMAKE_BINARY_DIR = /home/cdc/Desktop/webapp/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/raphters_static.dir/depend.make
@@ -48,7 +48,7 @@ include CMakeFiles/raphters_static.dir/flags.make
 
 CMakeFiles/raphters_static.dir/dispatcher.c.o: CMakeFiles/raphters_static.dir/flags.make
 CMakeFiles/raphters_static.dir/dispatcher.c.o: ../dispatcher.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/bin/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/build/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/raphters_static.dir/dispatcher.c.o"
 	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/raphters_static.dir/dispatcher.c.o   -c /home/cdc/Desktop/webapp/dispatcher.c
 
@@ -71,7 +71,7 @@ CMakeFiles/raphters_static.dir/dispatcher.c.o.provides.build: CMakeFiles/raphter
 
 CMakeFiles/raphters_static.dir/request.c.o: CMakeFiles/raphters_static.dir/flags.make
 CMakeFiles/raphters_static.dir/request.c.o: ../request.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/bin/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/build/CMakeFiles $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/raphters_static.dir/request.c.o"
 	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/raphters_static.dir/request.c.o   -c /home/cdc/Desktop/webapp/request.c
 
@@ -94,7 +94,7 @@ CMakeFiles/raphters_static.dir/request.c.o.provides.build: CMakeFiles/raphters_s
 
 CMakeFiles/raphters_static.dir/response.c.o: CMakeFiles/raphters_static.dir/flags.make
 CMakeFiles/raphters_static.dir/response.c.o: ../response.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/bin/CMakeFiles $(CMAKE_PROGRESS_3)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/build/CMakeFiles $(CMAKE_PROGRESS_3)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/raphters_static.dir/response.c.o"
 	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/raphters_static.dir/response.c.o   -c /home/cdc/Desktop/webapp/response.c
 
@@ -117,7 +117,7 @@ CMakeFiles/raphters_static.dir/response.c.o.provides.build: CMakeFiles/raphters_
 
 CMakeFiles/raphters_static.dir/raphters.c.o: CMakeFiles/raphters_static.dir/flags.make
 CMakeFiles/raphters_static.dir/raphters.c.o: ../raphters.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/bin/CMakeFiles $(CMAKE_PROGRESS_4)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/build/CMakeFiles $(CMAKE_PROGRESS_4)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/raphters_static.dir/raphters.c.o"
 	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/raphters_static.dir/raphters.c.o   -c /home/cdc/Desktop/webapp/raphters.c
 
@@ -173,6 +173,6 @@ CMakeFiles/raphters_static.dir/clean:
 .PHONY : CMakeFiles/raphters_static.dir/clean
 
 CMakeFiles/raphters_static.dir/depend:
-	cd /home/cdc/Desktop/webapp/bin && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/cdc/Desktop/webapp /home/cdc/Desktop/webapp /home/cdc/Desktop/webapp/bin /home/cdc/Desktop/webapp/bin /home/cdc/Desktop/webapp/bin/CMakeFiles/raphters_static.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/cdc/Desktop/webapp/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/cdc/Desktop/webapp /home/cdc/Desktop/webapp /home/cdc/Desktop/webapp/build /home/cdc/Desktop/webapp/build /home/cdc/Desktop/webapp/build/CMakeFiles/raphters_static.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/raphters_static.dir/depend
 

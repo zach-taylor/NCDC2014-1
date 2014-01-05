@@ -6,11 +6,33 @@
 
 #IncludeRegexTransform: 
 
-/home/cdc/Desktop/webapp/webapp/utils.c
-stdio.h
--
+../dispatcher.h
+regex.h
+../regex.h
 stdlib.h
--
-string.h
--
+../stdlib.h
+utils.h
+../utils.h
+
+../raphters.h
+dispatcher.h
+../dispatcher.h
+response.h
+../response.h
+request.h
+../request.h
+
+../request.h
+
+../response.h
+stdbool.h
+../stdbool.h
+
+/home/cdc/Desktop/webapp/webapp/utils.h
+
+/home/cdc/Desktop/webapp/webapp/webapp.c
+raphters.h
+/home/cdc/Desktop/webapp/webapp/raphters.h
+utils.h
+/home/cdc/Desktop/webapp/webapp/utils.h
 

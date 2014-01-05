@@ -35,7 +35,7 @@ RM = /usr/bin/cmake -E remove -f
 CMAKE_SOURCE_DIR = /home/cdc/Desktop/webapp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/cdc/Desktop/webapp/bin
+CMAKE_BINARY_DIR = /home/cdc/Desktop/webapp/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/webapp.dir/depend.make
@@ -48,7 +48,7 @@ include CMakeFiles/webapp.dir/flags.make
 
 CMakeFiles/webapp.dir/webapp/webapp.c.o: CMakeFiles/webapp.dir/flags.make
 CMakeFiles/webapp.dir/webapp/webapp.c.o: ../webapp/webapp.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/bin/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/build/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/webapp.dir/webapp/webapp.c.o"
 	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/webapp.dir/webapp/webapp.c.o   -c /home/cdc/Desktop/webapp/webapp/webapp.c
 
@@ -71,7 +71,7 @@ CMakeFiles/webapp.dir/webapp/webapp.c.o.provides.build: CMakeFiles/webapp.dir/we
 
 CMakeFiles/webapp.dir/webapp/utils.c.o: CMakeFiles/webapp.dir/flags.make
 CMakeFiles/webapp.dir/webapp/utils.c.o: ../webapp/utils.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/bin/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/cdc/Desktop/webapp/build/CMakeFiles $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/webapp.dir/webapp/utils.c.o"
 	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/webapp.dir/webapp/utils.c.o   -c /home/cdc/Desktop/webapp/webapp/utils.c
 
@@ -121,6 +121,6 @@ CMakeFiles/webapp.dir/clean:
 .PHONY : CMakeFiles/webapp.dir/clean
 
 CMakeFiles/webapp.dir/depend:
-	cd /home/cdc/Desktop/webapp/bin && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/cdc/Desktop/webapp /home/cdc/Desktop/webapp /home/cdc/Desktop/webapp/bin /home/cdc/Desktop/webapp/bin /home/cdc/Desktop/webapp/bin/CMakeFiles/webapp.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/cdc/Desktop/webapp/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/cdc/Desktop/webapp /home/cdc/Desktop/webapp /home/cdc/Desktop/webapp/build /home/cdc/Desktop/webapp/build /home/cdc/Desktop/webapp/build/CMakeFiles/webapp.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/webapp.dir/depend
 

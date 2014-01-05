@@ -4,10 +4,10 @@ SET(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 SET(CMAKE_DEPENDS_CHECK_C
-  "/home/cdc/Desktop/webapp/dispatcher.c" "/home/cdc/Desktop/webapp/bin/CMakeFiles/raphters_static.dir/dispatcher.c.o"
-  "/home/cdc/Desktop/webapp/raphters.c" "/home/cdc/Desktop/webapp/bin/CMakeFiles/raphters_static.dir/raphters.c.o"
-  "/home/cdc/Desktop/webapp/request.c" "/home/cdc/Desktop/webapp/bin/CMakeFiles/raphters_static.dir/request.c.o"
-  "/home/cdc/Desktop/webapp/response.c" "/home/cdc/Desktop/webapp/bin/CMakeFiles/raphters_static.dir/response.c.o"
+  "/home/cdc/Desktop/webapp/dispatcher.c" "/home/cdc/Desktop/webapp/build/CMakeFiles/raphters_static.dir/dispatcher.c.o"
+  "/home/cdc/Desktop/webapp/raphters.c" "/home/cdc/Desktop/webapp/build/CMakeFiles/raphters_static.dir/raphters.c.o"
+  "/home/cdc/Desktop/webapp/request.c" "/home/cdc/Desktop/webapp/build/CMakeFiles/raphters_static.dir/request.c.o"
+  "/home/cdc/Desktop/webapp/response.c" "/home/cdc/Desktop/webapp/build/CMakeFiles/raphters_static.dir/response.c.o"
   )
 SET(CMAKE_C_COMPILER_ID "GNU")
 
