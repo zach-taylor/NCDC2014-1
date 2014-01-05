@@ -1,9 +1,18 @@
 #!/bin/bash
 set -e
+
 make
+
 sudo /etc/init.d/lighttpd stop
+
 sudo rm /var/fastcgi/webapp
 sudo rm -r /var/fastcgi/templates
+sudo rm -r /var/www/static
+sudo rm /var/www/robots.txt
+
 sudo cp webapp /var/fastcgi/webapp
 sudo cp -r ../webapp/templates* /var/fastcgi/templates
+sudo cp -r ../webapp/static* /var/www/static
+sudo cp ../webapp/robots.txt /var/www/robots.txt
+
 sudo /etc/init.d/lighttpd start

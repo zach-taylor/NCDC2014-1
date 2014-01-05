@@ -1,0 +1,2 @@
+/usr/bin/ar cr libraphters_static.a  CMakeFiles/raphters_static.dir/dispatcher.c.o CMakeFiles/raphters_static.dir/request.c.o CMakeFiles/raphters_static.dir/response.c.o CMakeFiles/raphters_static.dir/raphters.c.o
+/usr/bin/ranlib libraphters_static.a

@@ -2,5 +2,5 @@
 *~
 
 # ignore everything in bin except the deploy script
-bin/*
+build/*
 !deploy

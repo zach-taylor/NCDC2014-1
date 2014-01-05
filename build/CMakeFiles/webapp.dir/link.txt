@@ -1,0 +1,1 @@
+/usr/bin/gcc  -g    CMakeFiles/webapp.dir/webapp/webapp.c.o CMakeFiles/webapp.dir/webapp/utils.c.o  -o webapp -rdynamic -L/usr/local/lib libraphters_dynamic.so -lfcgi -Wl,-rpath,/usr/local/lib:/home/cdc/Desktop/webapp/bin 
