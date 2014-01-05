@@ -17,8 +17,11 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+PROJECT(NCDC2014)
+
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/webapp" "/usr/local/include")
 SET(RaphtersSources dispatcher request response raphters)
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}" "/usr/local/include")
+SET(WebAppSources webapp/webapp.c webapp/utils.c)
 LINK_DIRECTORIES("/usr/local/lib")
 
 ADD_LIBRARY(raphters_dynamic SHARED ${RaphtersSources})
@@ -28,5 +31,5 @@ TARGET_LINK_LIBRARIES(raphters_dynamic fcgi)
 ADD_LIBRARY(raphters_static STATIC ${RaphtersSources})
 SET_TARGET_PROPERTIES(raphters_static PROPERTIES LINKER_LANGUAGE C)
 
-ADD_EXECUTABLE(simple examples/simple.c)
-TARGET_LINK_LIBRARIES(simple raphters_dynamic)
+ADD_EXECUTABLE(webapp ${WebAppSources})
+TARGET_LINK_LIBRARIES(webapp raphters_dynamic)

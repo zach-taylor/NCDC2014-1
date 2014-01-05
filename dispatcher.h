@@ -22,6 +22,7 @@
 
 #include "regex.h"
 #include "stdlib.h"
+#include "utils.h"
 
 #define GET 1
 #define POST 2
