@@ -10,6 +10,7 @@ This is the web app for the Spring 2014 ISU National Cyber Defense Competition. 
 * sudo apt-get install build-essential
 * sudo apt-get install libfcgi-dev
 * sudo apt-get install liburiparser-dev
+* sudo apt-get install mysql-server
 
 ## Development
 * sudo apt-get install git-core
