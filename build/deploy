@@ -26,3 +26,16 @@ if [[ -f /etc/lighttpd/conf-available/10-fastcgi.conf ]]; then
 fi
 
 sudo /etc/init.d/lighttpd start
+
+dbname="webapp"
+dbuser="cdc"
+dbpass="cdc"
+MYSQL=`which mysql`
+
+Q1="CREATE DATABASE IF NOT EXISTS $dbname;"
+Q2="GRANT ALL ON $dbname.* TO '$dbuser'@'localhost' IDENTIFIED BY '$dbpass';"
+Q3="FLUSH PRIVILEGES;"
+Q4="USE $dbname;"
+Q5="CREATE TABLE IF NOT EXISTS Users(Username varchar(255), Password varchar(255), LastName varchar(255), FirstName varchar(255));"
+
+$MYSQL -uroot -p -e "${Q1}${Q2}${Q3}${Q4}${Q5}"

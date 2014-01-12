@@ -78,7 +78,7 @@ char *get_server_port() {
 
 char *get_param(char *query_string, char *name) {
 	char *url = "http://localhost?"; // just a place holder to maker the parser happy
-	char *uri_string = malloc((strlen(url) + strlen(query_string)) * sizeof(char));
+	char *uri_string = malloc((strlen(url) + strlen(query_string)));
 	strcpy(uri_string,url);
 	strcat(uri_string,query_string);
 
@@ -94,7 +94,7 @@ char *get_param(char *query_string, char *name) {
 			int i;
 			for (i = 0; i < itemCount && itemPtr != NULL; i++, itemPtr = itemPtr->next) {
 				if(strcmp(name,itemPtr->key) == 0){
-					char *result = malloc((strlen(itemPtr->value)) * sizeof(char));
+					char *result = malloc((strlen(itemPtr->value)));
 					strcpy(result, itemPtr->value);
 					uriFreeQueryListA(queryList);
 					uriFreeUriMembersA(&uri);

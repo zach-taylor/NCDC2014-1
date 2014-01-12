@@ -19,10 +19,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(NCDC2014)
 
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/webapp" "/usr/local/include")
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/webapp" "/usr/local/include" "/usr/include")
 SET(RaphtersSources dispatcher request response raphters)
 SET(WebAppSources webapp/webapp.c webapp/utils.c)
-LINK_DIRECTORIES("/usr/local/lib")
+LINK_DIRECTORIES("/usr/local/lib" "/usr/include")
 
 ADD_LIBRARY(raphters_dynamic SHARED ${RaphtersSources})
 SET_TARGET_PROPERTIES(raphters_dynamic PROPERTIES LINKER_LANGUAGE C)
@@ -32,4 +32,4 @@ ADD_LIBRARY(raphters_static STATIC ${RaphtersSources})
 SET_TARGET_PROPERTIES(raphters_static PROPERTIES LINKER_LANGUAGE C)
 
 ADD_EXECUTABLE(webapp ${WebAppSources})
-TARGET_LINK_LIBRARIES(webapp cgi raphters_dynamic)
+TARGET_LINK_LIBRARIES(webapp cgi mysqlclient raphters_dynamic)

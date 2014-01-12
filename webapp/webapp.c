@@ -21,6 +21,7 @@
 #include "raphters.h"
 #include "utils.h"
 #include "fcgi_stdio.h"
+#include <mysql/mysql.h>
 
 void write_template(response *res) {
   const char *header = "HEADER";
@@ -42,22 +43,25 @@ START_HANDLER (webapp, POST, "/login", res, 0, matches) {
 
 	char* username = get_param(post_data, "username");
 	if(username == NULL){
-		error_handler("Username missing.");
-		return;
+		username = "";
 	}
 
 	char* password = get_param(post_data, "password");
 	if(password == NULL){
-		error_handler("Password missing.");
-		return;
+		password = "";
 	}
 
 	response_add_header(res, "content-type", "text/html");
 	write_page_template_header(res);
 
-	response_write(res, "TODO");
+	if(authenticate(username,password)){
+		response_write(res, "Success!");
+	} else {
+		response_write(res, "Username or password is incorrect.");
+	}
 
 	write_page_template_footer(res);
+
 } END_HANDLER
 
 // default route
