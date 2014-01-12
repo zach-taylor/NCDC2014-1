@@ -17,6 +17,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "dispatcher.h"
 #include "request.h"
 #include "error.h"
@@ -35,6 +38,7 @@ void default_error_handler(const char *msg) {
 void (*error_handler)(const char *) = default_error_handler;
 
 void dispatch() {
+
     handler *cur;
     char *path_info = get_path_info();
     if (path_info == NULL) {
@@ -46,6 +50,9 @@ void dispatch() {
         error_handler("NULL method_str");
         return;
     }
+
+    char *usr_agent_str = get_user_agent();
+
     int method;
     if (strcmp(method_str, "GET") == 0) {
         method = GET;
@@ -79,6 +86,7 @@ void dispatch() {
     strcat(err, " \"");
     strcat(err, path_info);
     strcat(err, "\"");
+    strcat(err, usr_agent_str);
     error_handler(err);
 }
 

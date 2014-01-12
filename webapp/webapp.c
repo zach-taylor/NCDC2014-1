@@ -17,8 +17,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//#include <cgi.h>
 #include "raphters.h"
 #include "utils.h"
+#include "fcgi_stdio.h"
 
 void write_template(response *res) {
   const char *header = "HEADER";
@@ -35,13 +37,30 @@ void write_page_template_footer(response *res){
   response_write(res, footer);
 }
 
-START_HANDLER (webapp, POST, "login", res, 0, matches) {
-  response_add_header(res, "content-type", "text/html");
-  write_page_template_header(res);
-  response_write(res, "todo");
-  write_page_template_footer(res);
+START_HANDLER (webapp, POST, "/login", res, 0, matches) {
+	char* post_data = get_post_string();
+
+	char* username = get_param(post_data, "username");
+	if(username == NULL){
+		error_handler("Username missing.");
+		return;
+	}
+
+	char* password = get_param(post_data, "password");
+	if(password == NULL){
+		error_handler("Password missing.");
+		return;
+	}
+
+	response_add_header(res, "content-type", "text/html");
+	write_page_template_header(res);
+
+	response_write(res, "TODO");
+
+	write_page_template_footer(res);
 } END_HANDLER
 
+// default route
 START_HANDLER (default_handler, GET, "", res, 0, matches) {
   response_add_header(res, "content-type", "text/html");
   write_page_template_header(res);

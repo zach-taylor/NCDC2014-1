@@ -24,9 +24,12 @@ char *get_referer();
 char *get_user_agent();
 char *get_path_info();
 char *get_query_string();
+char *get_post_string();
+char *get_content_length();
 char *get_remote_addr();
 char *get_method();
 char *get_server_name();
 char *get_server_port();
+char *get_param(char *query_string, char *name);
 
 #endif

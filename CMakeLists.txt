@@ -26,10 +26,10 @@ LINK_DIRECTORIES("/usr/local/lib")
 
 ADD_LIBRARY(raphters_dynamic SHARED ${RaphtersSources})
 SET_TARGET_PROPERTIES(raphters_dynamic PROPERTIES LINKER_LANGUAGE C)
-TARGET_LINK_LIBRARIES(raphters_dynamic fcgi)
+TARGET_LINK_LIBRARIES(raphters_dynamic uriparser fcgi)
 
 ADD_LIBRARY(raphters_static STATIC ${RaphtersSources})
 SET_TARGET_PROPERTIES(raphters_static PROPERTIES LINKER_LANGUAGE C)
 
 ADD_EXECUTABLE(webapp ${WebAppSources})
-TARGET_LINK_LIBRARIES(webapp raphters_dynamic)
+TARGET_LINK_LIBRARIES(webapp cgi raphters_dynamic)
