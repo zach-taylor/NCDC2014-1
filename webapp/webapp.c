@@ -38,7 +38,7 @@ void write_page_template_footer(response *res){
   response_write(res, footer);
 }
 
-START_HANDLER (webapp, POST, "/login", res, 0, matches) {
+START_HANDLER (login_handler, POST, "/login", res, 0, matches) {
 	char* post_data = get_post_string();
 
 	char* username = get_param(post_data, "username");
@@ -64,6 +64,50 @@ START_HANDLER (webapp, POST, "/login", res, 0, matches) {
 
 } END_HANDLER
 
+START_HANDLER (new_user_handler, GET, "/user/new", res, 0, matches) {
+	response_add_header(res, "content-type", "text/html");
+	write_page_template_header(res);
+	const char *create_form = read_file("./templates/new.html.template");
+	response_write(res, create_form);
+	write_page_template_footer(res);
+} END_HANDLER
+
+START_HANDLER (create_user_handler, POST, "/user/create", res, 0, matches) {
+	char* post_data = get_post_string();
+
+	char* username = get_param(post_data, "username");
+	if(username == NULL){
+		username = "";
+	}
+
+	char* password = get_param(post_data, "password");
+	if(password == NULL){
+		password = "";
+	}
+
+	char* first_name = get_param(post_data, "first_name");
+	if(first_name == NULL){
+		first_name = "";
+	}
+
+	char* last_name = get_param(post_data, "last_name");
+	if(last_name == NULL){
+		last_name = "";
+	}
+
+	response_add_header(res, "content-type", "text/html");
+	write_page_template_header(res);
+
+	if(add_user(username, password, first_name, last_name)){
+		response_write(res, "Success!");
+	} else {
+		response_write(res, "Could not create user.");
+	}
+
+	write_page_template_footer(res);
+
+} END_HANDLER
+
 // default route
 START_HANDLER (default_handler, GET, "", res, 0, matches) {
   response_add_header(res, "content-type", "text/html");
@@ -74,7 +118,9 @@ START_HANDLER (default_handler, GET, "", res, 0, matches) {
 } END_HANDLER
 
 int main() {
-    add_handler(webapp);
+    add_handler(login_handler);
+    add_handler(new_user_handler);
+    add_handler(create_user_handler);
     add_handler(default_handler);
     serve_forever();
     return 0;

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mysql/mysql.h>
+#include "utils.h"
 
 char* read_file(char* filename)
 {
@@ -29,11 +30,10 @@ int authenticate(char *username, char *password) {
 		return 0;
 	}
 
-	if (mysql_real_connect(con, "localhost", "cdc", "cdc", "webapp", 0, NULL, 0) == NULL){
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, 0) == NULL){
 		mysql_close(con);
 		return 0;
 	}
-
 
 	// INSERT INTO Users VALUES ('test','test','Test1','Test2');
 	char query[1024];
@@ -61,4 +61,28 @@ int authenticate(char *username, char *password) {
 
 	mysql_close(con);
 	return result;
+}
+
+int add_user(char *username, char *password, char *first_name, char *last_name) {
+	MYSQL *con = mysql_init(NULL);
+
+	if (con == NULL){
+		return 0;
+	}
+
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, 0) == NULL){
+		mysql_close(con);
+		return 0;
+	}
+
+	char query[1024];
+	sprintf(query, "INSERT INTO Users VALUES ('%s','%s','%s','%s');", username, password, first_name, last_name);
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return 0;
+	}
+
+	mysql_close(con);
+	return 1;
 }
