@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mysql/mysql.h>
+#include <cgi.h>
 #include "utils.h"
 
 char* read_file(char* filename)
@@ -21,6 +22,32 @@ char* read_file(char* filename)
     fread(content,1,size,file);
 
     return content;
+}
+
+int is_authenticated(){
+	s_cgi *cgi;
+	s_cookie *cookie;
+	cgi = cgiInit();
+	cookie = cgiGetCookie(cgi, "Authenticated");
+	if(cookie != NULL){
+		if(strcmp(cookie->value,"yes") == 0){
+			return 1;
+		}
+	}
+	return 0;
+}
+
+char *get_authenticated_user(){
+	if(is_authenticated()){
+		s_cgi *cgi;
+		s_cookie *cookie;
+		cgi = cgiInit();
+		cookie = cgiGetCookie(cgi, "Username");
+		if(cookie != NULL){
+			return strdup(cookie->value);
+		}
+	}
+	return NULL;
 }
 
 int authenticate(char *username, char *password) {

@@ -17,7 +17,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#include <cgi.h>
 #include "raphters.h"
 #include "utils.h"
 #include "fcgi_stdio.h"
@@ -56,16 +55,17 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 		password = "";
 	}
 
-	response_add_header(res, "content-type", "text/html");
-	write_page_template_header(res);
-
 	if(authenticate(username,password)){
-		response_write(res, "Success!");
+		char cookie[1024];
+		sprintf(cookie, "Authenticated=yes; Username=%s; path=/; max-age=604800;", username);
+		response_add_header(res, "Set-Cookie", cookie);
+		response_add_header(res, "Location", "/webapp/timesheet");
 	} else {
+		response_add_header(res, "content-type", "text/html");
+		write_page_template_header(res);
 		response_write(res, "Username or password is incorrect.");
+		write_page_template_footer(res);
 	}
-
-	write_page_template_footer(res);
 
 } END_HANDLER
 
@@ -106,13 +106,22 @@ START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches
 	write_page_template_header(res);
 
 	if(add_user(username, password, first_name, last_name)){
-		response_write(res, "Success!");
+		response_write(res, "Success! Created ");
+		response_write(res, username);
 	} else {
 		response_write(res, "Could not create user.");
 	}
 
 	write_page_template_footer(res);
 
+} END_HANDLER
+
+// timesheet page
+START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
+	write_page_template_header(res);
+	response_write(res, "Welcome: ");
+    response_write(res, get_authenticated_user());
+	write_page_template_footer(res);
 } END_HANDLER
 
 // default route
@@ -122,6 +131,7 @@ START_HANDLER (default_handler, GET, "", res, 0, matches) {
 } END_HANDLER
 
 int main() {
+	add_handler(timesheet_page_handler);
     add_handler(login_page_handler);
     add_handler(login_action_handler);
     add_handler(create_user_page_handler);
