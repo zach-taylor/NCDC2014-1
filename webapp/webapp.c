@@ -69,6 +69,13 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 
 } END_HANDLER
 
+// logout action
+START_HANDLER (logout_action_handler, GET, "/logout", res, 0, matches) {
+	// expire session
+	response_add_header(res, "Set-Cookie", "Authenticated=no; Username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
+	response_add_header(res, "Location", "/webapp/login");
+} END_HANDLER
+
 // add user page
 START_HANDLER (create_user_page_handler, GET, "/user/new", res, 0, matches) {
 	response_add_header(res, "content-type", "text/html");
@@ -118,22 +125,28 @@ START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches
 
 // timesheet page
 START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
-	write_page_template_header(res);
-	response_write(res, "Welcome: ");
-    response_write(res, get_authenticated_user());
-	write_page_template_footer(res);
+	if(is_authenticated()){
+		response_add_header(res, "content-type", "text/html");
+		write_page_template_header(res);
+		response_write(res, "<p>Welcome: ");
+		response_write(res, get_authenticated_user());
+		response_write(res, " [<a href=\"/webapp/logout\">Logout</a>]</p>");
+		write_page_template_footer(res);
+	} else {
+		response_add_header(res, "Location", "/webapp/login"); // redirect to login page
+	}
 } END_HANDLER
 
 // default route
 START_HANDLER (default_handler, GET, "", res, 0, matches) {
-	// redirect to login page
-	response_add_header(res, "Location", "/webapp/login");
+	response_add_header(res, "Location", "/webapp/login"); // redirect to login page
 } END_HANDLER
 
 int main() {
 	add_handler(timesheet_page_handler);
     add_handler(login_page_handler);
     add_handler(login_action_handler);
+    add_handler(logout_action_handler);
     add_handler(create_user_page_handler);
     add_handler(create_user_action_handler);
     add_handler(default_handler);
