@@ -3,7 +3,8 @@
 
 #include "response.h"
 
-void write_page_template_header(response *);
-void write_page_template_footer(response *);
+void write_template(response *res, char *template);
+void write_page_template_header(response *res);
+void write_page_template_footer(response *res);
 
 #endif

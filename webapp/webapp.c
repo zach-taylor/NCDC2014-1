@@ -23,22 +23,27 @@
 #include "fcgi_stdio.h"
 #include <mysql/mysql.h>
 
-void write_template(response *res) {
-  const char *header = "HEADER";
-  response_write(res, header);
+void write_template(response *res, char *template) {
+	const char *content = read_file(template);
+	response_write(res, content);
 }
 
 void write_page_template_header(response *res){
-  const char *header = "HEADER";
-  response_write(res, header);
+	write_template(res, "./templates/header.html.template");
 }
 
 void write_page_template_footer(response *res){
-  const char *footer = "FOOTER";
-  response_write(res, footer);
+	write_template(res, "./templates/footer.html.template");
 }
 
-START_HANDLER (login_handler, POST, "/login", res, 0, matches) {
+// login page
+START_HANDLER (login_page_handler, GET, "/login", res, 0, matches) {
+	response_add_header(res, "content-type", "text/html");
+	write_template(res, "./templates/login.html.template");
+} END_HANDLER
+
+// login action
+START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 	char* post_data = get_post_string();
 
 	char* username = get_param(post_data, "username");
@@ -64,7 +69,8 @@ START_HANDLER (login_handler, POST, "/login", res, 0, matches) {
 
 } END_HANDLER
 
-START_HANDLER (new_user_handler, GET, "/user/new", res, 0, matches) {
+// add user page
+START_HANDLER (create_user_page_handler, GET, "/user/new", res, 0, matches) {
 	response_add_header(res, "content-type", "text/html");
 	write_page_template_header(res);
 	const char *create_form = read_file("./templates/new.html.template");
@@ -72,7 +78,8 @@ START_HANDLER (new_user_handler, GET, "/user/new", res, 0, matches) {
 	write_page_template_footer(res);
 } END_HANDLER
 
-START_HANDLER (create_user_handler, POST, "/user/create", res, 0, matches) {
+// add user action
+START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches) {
 	char* post_data = get_post_string();
 
 	char* username = get_param(post_data, "username");
@@ -110,17 +117,15 @@ START_HANDLER (create_user_handler, POST, "/user/create", res, 0, matches) {
 
 // default route
 START_HANDLER (default_handler, GET, "", res, 0, matches) {
-  response_add_header(res, "content-type", "text/html");
-  write_page_template_header(res);
-  const char *login_form = read_file("./templates/login.html.template");
-  response_write(res, login_form);
-  write_page_template_footer(res);
+	// redirect to login page
+	response_add_header(res, "Location", "/webapp/login");
 } END_HANDLER
 
 int main() {
-    add_handler(login_handler);
-    add_handler(new_user_handler);
-    add_handler(create_user_handler);
+    add_handler(login_page_handler);
+    add_handler(login_action_handler);
+    add_handler(create_user_page_handler);
+    add_handler(create_user_action_handler);
     add_handler(default_handler);
     serve_forever();
     return 0;

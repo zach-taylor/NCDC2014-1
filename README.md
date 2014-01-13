@@ -44,7 +44,7 @@ To generate Eclipse project files run:
 * ./deploy
 
 ## Testing
-Go to [http://localhost/webapp](http://localhost/webapp)
+Go to [http://localhost](http://localhost)
 
 ## Framework Background
 This project is built on Raphters, a web framework for C based on the rapht architectural pattern (see RAPHT).
@@ -53,3 +53,11 @@ Q: Why would you want to build a web application in C? Didn't that idea die out
 with CGI?
 
 A: Good question. C is fast and fun, when you use well-tested code it can be secure too. It also has a low memory foot-print. The aim of the project is that all of the usual functionality that you have in other frameworks (cookie handling, session management, templating etc) will be implemented via loosly coupled components with clean APIs.
+
+## Attributions
+This project uses some works which require attributions.
+* Shield designed by Nate Eul from the Noun Project
+* Conversation designed by Gregory Radek from the Noun Project
+* Network designed by iconoci from the Noun Project 
+* Virus designed by Anu Prasadh Raja from the Noun Project
+* Meeting designed by Slava Strizh from the Noun Project
