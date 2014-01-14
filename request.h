@@ -25,6 +25,7 @@ char *get_user_agent();
 char *get_path_info();
 char *get_query_string();
 char *get_post_string();
+void *get_post_data();
 char *get_content_length();
 char *get_remote_addr();
 char *get_method();

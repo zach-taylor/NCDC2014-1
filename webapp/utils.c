@@ -37,15 +37,13 @@ int is_authenticated(){
 	return 0;
 }
 
-char *get_authenticated_user(){
-	if(is_authenticated()){
-		s_cgi *cgi;
-		s_cookie *cookie;
-		cgi = cgiInit();
-		cookie = cgiGetCookie(cgi, "Username");
-		if(cookie != NULL){
-			return strdup(cookie->value);
-		}
+char *get_username(){
+	s_cgi *cgi;
+	s_cookie *cookie;
+	cgi = cgiInit();
+	cookie = cgiGetCookie(cgi, "Username");
+	if(cookie != NULL){
+		return strdup(cookie->value);
 	}
 	return NULL;
 }

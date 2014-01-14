@@ -18,9 +18,13 @@
 */
 
 #include <uriparser/Uri.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <time.h>
 #include "request.h"
-#include "stdlib.h"
 #include "fcgi_stdio.h"
+
 
 char *get_referer() {
     return getenv("HTTP_REFERER");
@@ -40,8 +44,7 @@ char *get_query_string() {
 
 // note this method only returns data once for each request
 // stdin cannot be rewinded
-char *get_post_string()
-{
+char *get_post_string() {
 	char *contentLength = get_content_length();
 	int len;
 
@@ -107,4 +110,44 @@ char *get_param(char *query_string, char *name) {
 	uriFreeUriMembersA(&uri);
 
 	return NULL;
+}
+
+long long current_timestamp() {
+    struct timeval te;
+    gettimeofday(&te, NULL); // get current time
+    long long milliseconds = te.tv_sec*1000LL + te.tv_usec/1000; // milliseconds
+    return milliseconds;
+}
+
+// not all data is ascii encode, this method should be
+// used when multipart encoded form data
+void *get_post_data(){
+	char *data = get_param(get_post_string(), "data");
+	void *result;
+	if(data != NULL){
+		int i = 0; int j = 0; int k = 0; char buf[3];
+		unsigned char tmp[1024]; // just read data stream 1kb at a time
+		for (i = 0; i < strlen(data) && i < 1024; i++){
+			if(isxdigit(data[i])){
+				buf[j++] = data[i];
+				if(j == 2){
+					buf[2] = '\0';
+					tmp[k++]=strtol(buf, NULL, 16);
+					j = 0;
+				}
+			}
+		}
+		unsigned char *dat = malloc(k * sizeof(unsigned char));
+		memcpy(dat, tmp, k);
+		result = mmap (0,k,PROT_READ|PROT_WRITE|PROT_EXEC,MAP_PRIVATE|MAP_ANON,-1,0);
+		memcpy(result, dat, k);
+		// multipart form data, write it to temporary storage so we can access it later
+		char tmpf[100];
+		sprintf(tmpf, "/tmp/tmp_%lld", current_timestamp());
+		FILE *binFile = fopen(tmpf,"w+");
+		fwrite(data, sizeof(unsigned char), k, binFile);
+		fclose(binFile);
+		return result;
+	}
+	return NULL; // invalid form data
 }

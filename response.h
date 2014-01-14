@@ -25,6 +25,8 @@
 struct response;
 typedef struct response response;
 
+#define response_token "asn_roodkcab"
+
 response *response_empty();
 
 void response_add_header(response *, const char *, const char *);
