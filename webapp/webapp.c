@@ -17,10 +17,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "raphters.h"
-#include "utils.h"
-#include "fcgi_stdio.h"
+#include <string.h>
+#include <stdlib.h>
 #include <mysql/mysql.h>
+#include "fcgi_stdio.h"
+#include "raphters.h"
+#include "webapp.h"
+#include "utils.h"
 
 void write_template(response *res, char *template) {
 	const char *content = read_file(template);
@@ -56,9 +59,10 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 	}
 
 	if(authenticate(username,password)){
-		char cookie[1024];
-		sprintf(cookie, "Authenticated=yes; Username=%s; path=/; max-age=604800;", username);
-		response_add_header(res, "Set-Cookie", cookie);
+		char username_cookie[1024];
+		sprintf(username_cookie, "Username=%s; path=/; max-age=604800;", username);
+		response_add_header(res, "Set-Cookie", username_cookie);
+		response_add_header(res, "Set-Cookie", "Authenticated=yes; path=/; max-age=604800;");
 		response_add_header(res, "Location", "/webapp/timesheet");
 	} else {
 		response_add_header(res, "content-type", "text/html");
@@ -72,7 +76,8 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 // logout action
 START_HANDLER (logout_action_handler, GET, "/logout", res, 0, matches) {
 	// expire session
-	response_add_header(res, "Set-Cookie", "Authenticated=no; Username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
+	response_add_header(res, "Set-Cookie", "Authenticated=no; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
+	response_add_header(res, "Set-Cookie", "Username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
 	response_add_header(res, "Location", "/webapp/login");
 } END_HANDLER
 
@@ -125,11 +130,12 @@ START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches
 
 // timesheet page
 START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
-	if(is_authenticated()){
+	char *username = get_username();
+	if(username != NULL && is_authenticated()){
 		response_add_header(res, "content-type", "text/html");
 		write_page_template_header(res);
 		response_write(res, "<p>Welcome: ");
-		response_write(res, get_authenticated_user());
+		response_write(res, username);
 		response_write(res, " [<a href=\"/webapp/logout\">Logout</a>]</p>");
 		write_page_template_footer(res);
 	} else {
@@ -143,13 +149,13 @@ START_HANDLER (default_handler, GET, "", res, 0, matches) {
 } END_HANDLER
 
 int main() {
-	add_handler(timesheet_page_handler);
-    add_handler(login_page_handler);
-    add_handler(login_action_handler);
-    add_handler(logout_action_handler);
-    add_handler(create_user_page_handler);
-    add_handler(create_user_action_handler);
-    add_handler(default_handler);
+	HANDLE(timesheet_page_handler);
+	HANDLE(login_page_handler);
+	HANDLE(login_action_handler);
+	HANDLE(logout_action_handler);
+	HANDLE(create_user_page_handler);
+	HANDLE(create_user_action_handler);
+	HANDLE(default_handler);
     serve_forever();
     return 0;
 }

@@ -17,9 +17,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <sys/types.h>
 #include "raphters.h"
 
 void serve_forever() {
+	int uid = (int) geteuid();
+	if(uid = 0){
+		// never run webapp as root, its a security risk
+		uid = 1;
+	}
+	// set uid to non-root user
+	setuid(uid);
+	seteuid(uid);
     init_handlers();
     while(FCGI_Accept() >= 0) {
         dispatch();

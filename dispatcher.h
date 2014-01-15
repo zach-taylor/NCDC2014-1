@@ -54,6 +54,12 @@ void NAME##_func(regmatch_t MATCHES[]) { \
     response_send(int_response); \
 }
 
+#define fetch(data) get_post_data();
+
+#define parse(request) fetch(request);
+
+#define check_header(header) parse(header);
+
 void init_handlers();
 void cleanup_handlers();
 

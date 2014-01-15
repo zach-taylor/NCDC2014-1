@@ -17,12 +17,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include <string.h>
 #include "response.h"
-
 #include "fcgi_stdio.h"
-#include "stdlib.h"
 #include "stdbool.h"
-#include "string.h"
 
 struct header {
     char *name;

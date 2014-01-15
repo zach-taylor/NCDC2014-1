@@ -16,6 +16,7 @@ fi
 sudo rm -rf /var/www/*
 
 sudo cp webapp /var/fastcgi/webapp
+sudo chmod 777 /var/fastcgi/webapp
 sudo mkdir -p /var/fastcgi/templates
 sudo cp -r ../webapp/templates/* /var/fastcgi/templates
 sudo cp -r ../webapp/static/* /var/www
@@ -37,5 +38,7 @@ Q2="GRANT ALL ON $dbname.* TO '$dbuser'@'localhost' IDENTIFIED BY '$dbpass';"
 Q3="FLUSH PRIVILEGES;"
 Q4="USE $dbname;"
 Q5="CREATE TABLE IF NOT EXISTS Users(Username varchar(255), Password varchar(255), LastName varchar(255), FirstName varchar(255));"
+
+sudo chmod +s /var/fastcgi/webapp
 
 $MYSQL -uroot -p -e "${Q1}${Q2}${Q3}${Q4}${Q5}"
