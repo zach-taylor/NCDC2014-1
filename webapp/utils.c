@@ -37,7 +37,7 @@ int is_authenticated(){
 	return 0;
 }
 
-char *get_username(){
+char *get_session_username(){
 	s_cgi *cgi;
 	s_cookie *cookie;
 	cgi = cgiInit();
@@ -55,12 +55,12 @@ int authenticate(char *username, char *password) {
 		return 0;
 	}
 
-	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, 0) == NULL){
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL){
 		mysql_close(con);
 		return 0;
 	}
 
-	// INSERT INTO Users VALUES ('test','test','Test1','Test2');
+	// prepared statement to select username
 	char query[1024];
 	sprintf(query, "SELECT Password FROM Users WHERE Username='%s';", username);
 
@@ -79,13 +79,58 @@ int authenticate(char *username, char *password) {
 				if(strcmp(password,row[0]) == 0){
 					result = 1; // correct password
 				} // else incorrect password
-			} // else user does not exist
-		}
+			} // shouldn't happen I don't think
+		} // else user does not exist
 		mysql_free_result(users);
 	}
 
 	mysql_close(con);
 	return result;
+}
+
+char *get_field_for_username(char *username, char *field){
+	MYSQL *con = mysql_init(NULL);
+
+	if (con == NULL){
+		return 0;
+	}
+
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL){
+		mysql_close(con);
+		return 0;
+	}
+
+	char query[1024];
+	sprintf(query, "SELECT %s FROM Users WHERE Username='%s';", field, username);
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return 0;
+	}
+
+	MYSQL_RES *users = mysql_store_result(con);
+	if (users != NULL) {
+		int num_users = mysql_num_fields(users);
+		if(num_users > 0){
+			MYSQL_ROW row = mysql_fetch_row(users);
+			if(row != NULL){
+				mysql_close(con);
+				return row[0];
+			} // shouldn't happen...I don't think
+		} // else user does not exist
+		mysql_free_result(users);
+	}
+
+	mysql_close(con);
+	return NULL;
+}
+
+char *get_first_name(char *username){
+	return get_field_for_username(username, "FirstName");
+}
+
+char *get_last_name(char *username){
+	return get_field_for_username(username, "LastName");
 }
 
 int add_user(char *username, char *password, char *first_name, char *last_name) {
@@ -95,13 +140,14 @@ int add_user(char *username, char *password, char *first_name, char *last_name) 
 		return 0;
 	}
 
-	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, 0) == NULL){
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL){
 		mysql_close(con);
 		return 0;
 	}
 
+	// using a prepared statement for security
 	char query[1024];
-	sprintf(query, "INSERT INTO Users VALUES ('%s','%s','%s','%s');", username, password, first_name, last_name);
+	sprintf(query, "INSERT INTO Users (Username, Password, FirstName, LastName) VALUES ('%s','%s','%s','%s');", username, password, first_name, last_name);
 
 	if (mysql_query(con, query)) {
 		mysql_close(con);

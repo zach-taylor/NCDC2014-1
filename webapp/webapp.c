@@ -38,6 +38,20 @@ void write_page_template_footer(response *res){
 	write_template(res, "./templates/footer.html.template");
 }
 
+void write_logout_link(response *res, char *username){
+	if(username != NULL){
+		char *first_name = get_first_name(username);
+		char *last_name = get_last_name(username);
+		if(first_name != NULL && last_name != NULL){
+			response_write(res, "<p>Welcome: ");
+			response_write(res, first_name);
+			response_write(res, " ");
+			response_write(res, last_name);
+			response_write(res, " [<a href=\"/webapp/logout\">Logout</a>]</p>");
+		}
+	}
+}
+
 // login page
 START_HANDLER (login_page_handler, GET, "/login", res, 0, matches) {
 	response_add_header(res, "content-type", "text/html");
@@ -130,13 +144,11 @@ START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches
 
 // timesheet page
 START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
-	char *username = get_username();
+	char *username = get_session_username();
 	if(username != NULL && is_authenticated()){
 		response_add_header(res, "content-type", "text/html");
 		write_page_template_header(res);
-		response_write(res, "<p>Welcome: ");
-		response_write(res, username);
-		response_write(res, " [<a href=\"/webapp/logout\">Logout</a>]</p>");
+		write_logout_link(res, username);
 		write_page_template_footer(res);
 	} else {
 		response_add_header(res, "Location", "/webapp/login"); // redirect to login page
