@@ -157,6 +157,8 @@ START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches
 } END_HANDLER
 
 // timesheet page
+// TODO: should we do some XSS protection????
+// https://www.youtube.com/watch?v=L5l9lSnNMxg
 START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 	char *username = get_session_username();
 	if(username != NULL && is_authenticated()){

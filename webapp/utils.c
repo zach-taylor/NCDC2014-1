@@ -55,6 +55,8 @@ int authenticate(char *username, char *password) {
 		return 0;
 	}
 
+        // use the real functions
+        // https://www.youtube.com/watch?v=_jKylhJtPmI
 	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL){
 		mysql_close(con);
 		return 0;
