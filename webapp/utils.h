@@ -12,6 +12,6 @@ int is_authenticated();
 char *get_session_username();
 char *get_first_name(char *username);
 char *get_last_name(char *username);
-int add_user(char *username, char *password, char *first_name, char *last_name);
+int add_user(char *username, char *password, char *first_name, char *last_name, char *ssn, char is_admin);
 
 #endif

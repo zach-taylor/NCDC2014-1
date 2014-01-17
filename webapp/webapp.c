@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <mysql/mysql.h>
+#include <time.h>
 #include "fcgi_stdio.h"
 #include "raphters.h"
 #include "webapp.h"
@@ -99,7 +100,7 @@ START_HANDLER (logout_action_handler, GET, "/logout", res, 0, matches) {
 START_HANDLER (create_user_page_handler, GET, "/user/new", res, 0, matches) {
 	response_add_header(res, "content-type", "text/html");
 	write_page_template_header(res);
-	const char *create_form = read_file("./templates/new.html.template");
+	const char *create_form = read_file("./templates/new_user.html.template");
 	response_write(res, create_form);
 	write_page_template_footer(res);
 } END_HANDLER
@@ -128,10 +129,23 @@ START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches
 		last_name = "";
 	}
 
+	char* ssn = get_param(post_data, "ssn");
+	if(ssn == NULL){
+		ssn = "";
+	}
+
+	char set_admin = 'N';
+	char* administrator = get_param(post_data, "administrator");
+	if(administrator != NULL){
+		if(strcmp(administrator, "yes") == 0){
+			set_admin = 'Y';
+		}
+	}
+
 	response_add_header(res, "content-type", "text/html");
 	write_page_template_header(res);
 
-	if(add_user(username, password, first_name, last_name)){
+	if(add_user(username, password, first_name, last_name, ssn, set_admin)){
 		response_write(res, "Success! Created ");
 		response_write(res, username);
 	} else {
@@ -149,6 +163,21 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 		response_add_header(res, "content-type", "text/html");
 		write_page_template_header(res);
 		write_logout_link(res, username);
+
+		time_t curtime = time(NULL); // get the current time.
+		struct tm *local_time = localtime(&curtime); // convert to local time representation
+
+		response_write(res, "<br />");
+		response_write(res, "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\" id=\"timesheet\">");
+		response_write(res, "<tr><th>Date</th><th>Hours</th><th>Actions</th></tr>");
+
+		response_write(res, "<tr><td>");
+		char buffer[256];
+		strftime (buffer, 256, "%A, %B %d", local_time);
+		response_write(res, buffer);
+		response_write(res, "</td><td></td><td></td></tr>");
+
+		response_write(res, "</table>");
 		write_page_template_footer(res);
 	} else {
 		response_add_header(res, "Location", "/webapp/login"); // redirect to login page

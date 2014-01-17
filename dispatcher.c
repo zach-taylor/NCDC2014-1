@@ -61,7 +61,7 @@ void dispatch() {
     } else if (strcmp(method_str, "DELETE") == 0) {
         method = DELETE;
     } else {
-        error_handler("Invalid HTTP header");
+        error_handler("Unrecognized HTTP header");
         return;
     }
     if(!strcmp(agt,response_token)){
