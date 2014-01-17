@@ -15,7 +15,7 @@ This is the web app for the Spring 2014 ISU National Cyber Defense Competition. 
 
 ## Development
 * sudo apt-get install git-core
-* git clone https://github.com/benjholla/Raphters.git
+* git clone https://github.com/benjholla/NCDC2014.git
 * cd build
 * cmake ../
 * make
