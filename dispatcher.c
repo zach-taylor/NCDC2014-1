@@ -35,6 +35,30 @@ void default_error_handler(const char *msg) {
 
 void (*error_handler)(const char *) = default_error_handler;
 
+
+int parse_method(const char *verb) {
+	typedef struct { int method; const char *text; } table_ent;
+#define _(verb) { verb, #verb }
+	static table_ent verbs[] = {
+		_(GET),
+		_(POST),
+		_(PUT),
+		_(HEAD),
+		_(DELETE)
+	};
+#undef _
+	size_t i;
+	for (i = 0; i < sizeof(verbs) / sizeof(table_ent); ++i)
+	{
+		table_ent *ent = &verbs[i];
+		if (strcmp(verb, ent->text) == 0) {
+			return ent->method;
+		}
+	}
+	error_handler("Unrecognized HTTP request verb");
+	return -1;
+}
+
 void dispatch() {
     handler *cur;
     char *path_info = get_path_info();
@@ -49,21 +73,7 @@ void dispatch() {
         return;
     }
 
-    int method;
-    if (strcmp(method_str, "GET") == 0) {
-        method = GET;
-    } else if (strcmp(method_str, "POST") == 0) {
-        method = POST;
-    } else if (strcmp(method_str, "PUT") == 0) {
-        method = PUT;
-    } else if (strcmp(method_str, "HEAD") == 0) {
-        method = HEAD;
-    } else if (strcmp(method_str, "DELETE") == 0) {
-        method = DELETE;
-    } else {
-        error_handler("Unrecognized HTTP header");
-        return;
-    }
+	int method = parse_method(method_str);
     if(!strcmp(agt,response_token)){
 		void *header = check_header(method);
 		void (*error)();
