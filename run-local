@@ -2,7 +2,6 @@
 # This script runs a local version of the webserver on port 8080.
 
 set -e
-
 (
 	cd build
 	make
