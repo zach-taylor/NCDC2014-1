@@ -19,8 +19,10 @@
 
 #include <sys/types.h>
 #include "raphters.h"
+#include "backtrace.h"
 
 void serve_forever() {
+	(void)install_segfault_handler();
 	int uid = (int) geteuid();
 	if(uid = 0){
 		// never run webapp as root, its a security risk
