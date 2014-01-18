@@ -3,6 +3,5 @@
 
 # ignore everything in bin except the deploy script
 build/*
-!build/deploy
 
 cscope.out
