@@ -14,6 +14,8 @@ This is the web app for the Spring 2014 ISU National Cyber Defense Competition. 
 * sudo apt-get install mysql-server
 * sudo apt-get install libmysqlclient-dev
 * sudo apt-get install lighttpd
+
+# Setup
 * sudo ln -s /etc/lighttpd/conf-available/10-fastcgi.conf /etc/lighttpd/conf-enabled/10-fastcgi.conf
 
 ## Development
