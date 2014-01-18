@@ -75,7 +75,7 @@ cleanup() {
 	exit $?
 }
 
-#trap cleanup EXIT
+trap cleanup EXIT
 
 echo "Starting server..."
 lighttpd -D -f $RUNDIR/lighttpd.conf 
