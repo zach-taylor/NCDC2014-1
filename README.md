@@ -15,7 +15,7 @@ This is the web app for the Spring 2014 ISU National Cyber Defense Competition. 
 * sudo apt-get install libmysqlclient-dev
 * sudo apt-get install lighttpd
 
-# Setup
+## Setup
 * sudo ln -s /etc/lighttpd/conf-available/10-fastcgi.conf /etc/lighttpd/conf-enabled/10-fastcgi.conf
 
 ## Development
@@ -34,11 +34,14 @@ Requires Java JRE:
 * sudo apt-get install openjdk-7-jre
 
 To generate Eclipse project files run:
-
+* cd NCDC2014
+* mkdir -p build
 * cd build
 * cmake -G"Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug ../
+* Inside Eclipse, File->Import->General->Existing Projects into Workspace
 
 ## Deployment
+* cd NCDC2014
 * ./deploy
 * Go to [http://localhost/](http://localhost/)
 
