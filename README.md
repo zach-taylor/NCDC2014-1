@@ -23,7 +23,7 @@ This is the web app for the Spring 2014 ISU National Cyber Defense Competition. 
 * git clone https://github.com/benjholla/NCDC2014.git
 * cd NCDC2014
 * ./run-local
-* Go to [http://localhost:8080/]http://localhost:8080/
+* Go to [http://localhost:8080/](http://localhost:8080/)
 
 ### Recommended IDE is Eclipse for C/C++
 [http://www.eclipse.org/downloads/packages/eclipse-ide-cc-developers/keplersr1](http://www.eclipse.org/downloads/packages/eclipse-ide-cc-developers/keplersr1)
