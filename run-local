@@ -1,0 +1,77 @@
+#!/bin/bash
+# This script runs a local version of the webserver on port 8080.
+
+set -e
+
+(
+	cd build
+	make
+)
+
+RUNDIR=$(mktemp --directory)
+
+mkdir -p \
+	$RUNDIR/cache \
+	$RUNDIR/cache/uploads \
+	$RUNDIR/cache/compress 
+
+cat >$RUNDIR/lighttpd.conf <<EOF
+server.modules = (
+	"mod_access",
+	"mod_alias",
+	"mod_compress",
+	"mod_redirect",
+	"mod_fastcgi",
+)
+
+server.document-root        = "webapp/static"
+server.upload-dirs          = ( "$RUNDIR/cache/uploads" )
+server.pid-file             = "$RUNDIR/lighttpd.pid"
+server.port                 = 8080
+debug.log-request-handling  = "enable"
+
+index-file.names            = ( "index.php", "index.html", "index.lighttpd.html" )
+url.access-deny             = ( "~", ".inc" )
+static-file.exclude-extensions = ( ".php", ".pl", ".fcgi" )
+
+compress.cache-dir          = "$RUNDIR/cache/compress"
+compress.filetype           = ( "application/javascript", "text/css", "text/html", "text/plain" )
+
+include_shell "/usr/share/lighttpd/create-mime.assign.pl"
+include_shell "/usr/share/lighttpd/include-conf-enabled.pl"
+
+\$HTTP["url"] !~ "^/robots.txt$|^/favicon.ico$|^/static" {
+  fastcgi.server = ( 
+	"/webapp" => ((
+		"bin-path" => "$PWD/build/webapp",
+		"socket" => "$RUNDIR/webapp.socket",
+		"check-local" => "disable"
+	))
+  )
+}
+fastcgi.debug = 1
+EOF
+
+dbname="webapp"
+dbuser="cdc"
+dbpass="cdc"
+
+mysql -uroot --password='' <<EOF
+CREATE DATABASE IF NOT EXISTS $dbname;
+GRANT ALL ON $dbname.* TO '$dbuser'@'localhost' IDENTIFIED BY '$dbpass';
+FLUSH PRIVILEGES;
+USE $dbname;
+CREATE TABLE IF NOT EXISTS Users(Username VARCHAR(255), Password VARCHAR(255), LastName VARCHAR(255), FirstName VARCHAR(255), SSN VARCHAR(10), IsAdmin CHAR(1));
+CREATE TABLE IF NOT EXISTS Entries(Username VARCHAR(255), Day DATE, MinutesWorked INT, ApprovedBy VARCHAR(255));
+EOF
+
+cleanup() {
+	echo "Cleaning up..."
+	rm -rf $RUNDIR
+	exit $?
+}
+
+trap cleanup EXIT
+
+echo "Starting server..."
+lighttpd -D -f $RUNDIR/lighttpd.conf 
