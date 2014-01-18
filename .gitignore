@@ -1,7 +1,7 @@
 # ignore temporary files
 *~
 
-# ignore everything in bin except the deploy script
+# ignore everything in build
 build/*
 
 cscope.out

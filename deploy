@@ -2,11 +2,13 @@
 
 set -e
 (
+	mkdir -p build
 	cd build
         cmake -DCMAKE_BUILD_TYPE=Debug ../
 	make
 	sudo /etc/init.d/lighttpd stop
 
+	sudo mkdir -p /var/fastcgi
 	if [[ -f /var/fastcgi/webapp ]]; then
 	  sudo rm /var/fastcgi/webapp
 	fi
