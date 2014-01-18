@@ -3,7 +3,7 @@
 This is the web app for the Spring 2014 ISU National Cyber Defense Competition.  It is designed to be intentionally insecure and should not be used in any production system.
 
 ## Prereqs
-* Originally developed on Ubuntu 12.04
+* Developed and tested on Ubuntu 12.04 LTS
 * sudo apt-get update
 * sudo apt-get install cmake
 * sudo apt-get install gcc 
@@ -13,13 +13,17 @@ This is the web app for the Spring 2014 ISU National Cyber Defense Competition. 
 * sudo apt-get install liburiparser-dev
 * sudo apt-get install mysql-server
 * sudo apt-get install libmysqlclient-dev
+* sudo apt-get install lighttpd
+
+## Setup
+* sudo ln -s /etc/lighttpd/conf-available/10-fastcgi.conf /etc/lighttpd/conf-enabled/10-fastcgi.conf
 
 ## Development
 * sudo apt-get install git-core
 * git clone https://github.com/benjholla/NCDC2014.git
-* cd build
-* cmake ../
-* make
+* cd NCDC2014
+* ./run-local
+* Go to [http://localhost:8080/](http://localhost:8080/)
 
 ### Recommended IDE is Eclipse for C/C++
 [http://www.eclipse.org/downloads/packages/eclipse-ide-cc-developers/keplersr1](http://www.eclipse.org/downloads/packages/eclipse-ide-cc-developers/keplersr1)
@@ -27,25 +31,19 @@ This is the web app for the Spring 2014 ISU National Cyber Defense Competition. 
 [http://www.cmake.org/Wiki/Eclipse_CDT4_Generator](http://www.cmake.org/Wiki/Eclipse_CDT4_Generator)
 
 Requires Java JRE:
-
 * sudo apt-get install openjdk-7-jre
 
 To generate Eclipse project files run:
-
+* cd NCDC2014
+* mkdir -p build
 * cd build
 * cmake -G"Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug ../
+* Inside Eclipse, File->Import->General->Existing Projects into Workspace
 
 ## Deployment
-* sudo apt-get install lighttpd
-* sudo mkdir /var/fastcgi
-* sudo ln -s /etc/lighttpd/conf-available/10-fastcgi.conf /etc/lighttpd/conf-enabled/10-fastcgi.conf
-
-### Pushing Code to Production
-* cd build
+* cd NCDC2014
 * ./deploy
-
-## Testing
-Go to [http://localhost](http://localhost)
+* Go to [http://localhost/](http://localhost/)
 
 ## Framework Background
 > This project is built on Raphters, a web framework for C based on the rapht architectural pattern (see RAPHT).
