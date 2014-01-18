@@ -15,6 +15,10 @@ mkdir -p \
 	$RUNDIR/cache/uploads \
 	$RUNDIR/cache/compress 
 
+cp build/webapp $RUNDIR
+cp -R webapp/static $RUNDIR/static
+cp -R webapp/templates $RUNDIR/templates
+
 cat >$RUNDIR/lighttpd.conf <<EOF
 server.modules = (
 	"mod_access",
@@ -24,7 +28,7 @@ server.modules = (
 	"mod_fastcgi",
 )
 
-server.document-root        = "webapp/static"
+server.document-root        = "$RUNDIR/static"
 server.upload-dirs          = ( "$RUNDIR/cache/uploads" )
 server.pid-file             = "$RUNDIR/lighttpd.pid"
 server.port                 = 8080
@@ -38,14 +42,14 @@ compress.cache-dir          = "$RUNDIR/cache/compress"
 compress.filetype           = ( "application/javascript", "text/css", "text/html", "text/plain" )
 
 include_shell "/usr/share/lighttpd/create-mime.assign.pl"
-include_shell "/usr/share/lighttpd/include-conf-enabled.pl"
 
 \$HTTP["url"] !~ "^/robots.txt$|^/favicon.ico$|^/static" {
   fastcgi.server = ( 
 	"/webapp" => ((
-		"bin-path" => "$PWD/build/webapp",
+		"bin-path" => "$RUNDIR/webapp",
 		"socket" => "$RUNDIR/webapp.socket",
-		"check-local" => "disable"
+		"check-local" => "disable",
+		"max-procs" => 1,
 	))
   )
 }
@@ -71,7 +75,7 @@ cleanup() {
 	exit $?
 }
 
-trap cleanup EXIT
+#trap cleanup EXIT
 
 echo "Starting server..."
 lighttpd -D -f $RUNDIR/lighttpd.conf 
