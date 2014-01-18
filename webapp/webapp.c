@@ -28,7 +28,9 @@
 
 void write_template(response *res, char *template) {
 	const char *content = read_file(template);
-	response_write(res, content);
+	if(content != NULL){
+		response_write(res, content);
+	}
 }
 
 void write_page_template_header(response *res){
@@ -100,8 +102,7 @@ START_HANDLER (logout_action_handler, GET, "/logout", res, 0, matches) {
 START_HANDLER (create_user_page_handler, GET, "/user/new", res, 0, matches) {
 	response_add_header(res, "content-type", "text/html");
 	write_page_template_header(res);
-	const char *create_form = read_file("./templates/new_user.html.template");
-	response_write(res, create_form);
+	write_template(res, "./templates/new_user.html.template");
 	write_page_template_footer(res);
 } END_HANDLER
 
@@ -166,20 +167,21 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 		write_page_template_header(res);
 		write_logout_link(res, username);
 
+		// write current date into a hidden field
 		time_t curtime = time(NULL); // get the current time.
 		struct tm *local_time = localtime(&curtime); // convert to local time representation
+		char hidden_vaule[256];
+		strftime (hidden_vaule, 256, "%A, %B %d", local_time);
+		response_write(res, "<input type=\"hidden\" name=\"current-date\" value=\"");
+		response_write(res, hidden_vaule);
+		response_write(res, "\">");
 
-		response_write(res, "<br />");
-		response_write(res, "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\" id=\"timesheet\">");
-		response_write(res, "<tr><th>Date</th><th>Hours</th><th>Actions</th></tr>");
+		// add the timesheet table container
+		response_write(res, "<br /><table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\" id=\"timesheet\"></table>");
 
-		response_write(res, "<tr><td>");
-		char buffer[256];
-		strftime (buffer, 256, "%A, %B %d", local_time);
-		response_write(res, buffer);
-		response_write(res, "</td><td></td><td></td></tr>");
+		// add the javascript logic for the timesheet
+		write_template(res, "./templates/timesheet.js.template");
 
-		response_write(res, "</table>");
 		write_page_template_footer(res);
 	} else {
 		response_add_header(res, "Location", "/webapp/login"); // redirect to login page
