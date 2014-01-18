@@ -15,7 +15,7 @@ This is the web app for the Spring 2014 ISU National Cyber Defense Competition. 
 
 ## Development
 * sudo apt-get install git-core
-* git clone https://github.com/benjholla/Raphters.git
+* git clone https://github.com/benjholla/NCDC2014.git
 * cd build
 * cmake ../
 * make
@@ -47,12 +47,11 @@ To generate Eclipse project files run:
 Go to [http://localhost](http://localhost)
 
 ## Framework Background
-This project is built on Raphters, a web framework for C based on the rapht architectural pattern (see RAPHT).
-
-Q: Why would you want to build a web application in C? Didn't that idea die out 
-with CGI?
-
-A: Good question. C is fast and fun, when you use well-tested code it can be secure too. It also has a low memory foot-print. The aim of the project is that all of the usual functionality that you have in other frameworks (cookie handling, session management, templating etc) will be implemented via loosly coupled components with clean APIs.
+> This project is built on Raphters, a web framework for C based on the rapht architectural pattern (see RAPHT).
+>     
+>     Q: Why would you want to build a web application in C? Didn't that idea die out with CGI?
+>     
+>     A: Good question. C is fast and fun, when you use well-tested code it can be secure too. It also has a low memory foot-print. The aim of the project is that all of the usual functionality that you have in other frameworks (cookie handling, session management, templating etc) will be implemented via loosly coupled components with clean APIs.
 
 ## Attributions
 This project uses some works which require attributions.
