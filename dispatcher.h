@@ -29,6 +29,7 @@
 #define PUT 3
 #define HEAD 4
 #define DELETE 5
+#define DISPATCH SEG
 
 extern void (*error_handler)(const char *);
 
@@ -65,5 +66,6 @@ void cleanup_handlers();
 
 void dispatch();
 void add_handler(handler *);
+void set_crash_handler(void (*on_crash)());
 
 #endif

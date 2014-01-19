@@ -18,11 +18,32 @@
 */
 
 #include <sys/types.h>
+#include <fcgi_stdio.h>
+#include <time.h>
 #include "raphters.h"
 #include "backtrace.h"
 
+void (*user_segfault)() = 0;
+
+void segfault() {
+#if defined(DEBUG) || 1
+
+    response *r = response_empty();
+    response_add_header(r, "content-type", "text/plain");
+    response_send(r);
+    show_backtrace(stdout);
+    show_backtrace(stderr);
+
+    if (user_segfault) { 
+        user_segfault();
+    }
+
+#endif
+}
+
 void serve_forever() {
-	(void)install_segfault_handler();
+	srand(time(0));
+	(void)install_segfault_handler(&segfault);
 	int uid = (int) geteuid();
 	if(uid = 0){
 		// never run webapp as root, its a security risk
