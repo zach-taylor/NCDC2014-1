@@ -9,6 +9,7 @@
 #include <fcgi_stdio.h>
 #include "backtrace.h"
 
+volatile static int caught_fatal = 0;
 static unw_context_t resume_ctx;
 static void (*segfault_callback)() = 0;
 
@@ -51,6 +52,10 @@ void on_segfault(int signal, siginfo_t *si, void *arg) {
 		segfault_callback();
 	}
 
+	caught_fatal = si->si_code == SI_USER || si->si_code == SI_TKILL;
+	
+	if (caught_fatal) return;
+
 	unw_cursor_t resume_cursor;
 	unw_init_local(&resume_cursor, &resume_ctx);
 	unw_resume(&resume_cursor);
@@ -67,6 +72,21 @@ int install_segfault_handler(void (*cb)()) {
 	if (rc = sigaction(SIGSEGV, &sa, NULL))
 		return rc;
 
+	if (rc = sigaction(SIGBUS, &sa, NULL))
+		return rc;
+
+	if (rc = sigaction(SIGABRT, &sa, NULL))
+		return rc;
+
+	if (rc = sigaction(SIGUSR1, &sa, NULL))
+		return rc;
+
 	unw_getcontext(&resume_ctx);
+
+	if (caught_fatal) {
+		// here we go!!!
+		void _start(void);
+		_start();
+	} 
 	return 0;
 }
