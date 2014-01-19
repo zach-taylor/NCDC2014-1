@@ -1,3 +1,51 @@
 <script>
-$('#timesheet > tbody:last').append('<tr><td>test2</td></tr>');
+var week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];	
+
+$(document).ready(function() {
+ 	// clear out the table, except the header
+	$('#timesheet > tbody:last').find('tr:gt(0)').remove();
+	
+	// repopulate the table
+        var currentDateParts = $('#current-date').val().split('-');
+	var today = new Date(currentDateParts[2], (currentDateParts[0]-1), currentDateParts[1]);
+
+	var queryDateParts = $('#query-date').val().split('-');
+	var queryDate = new Date(queryDateParts[2], (queryDateParts[0]-1), queryDateParts[1]);
+
+	// calculate a few handy dates to use later
+	var sunday = new Date(queryDate.getTime() - (queryDate.getDay() * (24 * 60 * 60 * 1000)));
+	var saturday = new Date(queryDate.getTime() + (((7 - queryDate.getDay()) - 1) * (24 * 60 * 60 * 1000)));
+	var lastSunday = new Date(sunday.getTime() - (7 * (24 * 60 * 60 * 1000)));
+	var nextSunday = new Date(sunday.getTime() + (7 * (24 * 60 * 60 * 1000)));
+
+	// update the next and last week link targets
+	$('#last-week').attr("href", "/webapp/timesheet?query=" + (lastSunday.getMonth() + 1) 
+			+ "-" + lastSunday.getDate() + "-" + lastSunday.getFullYear());
+	$('#next-week').attr("href", "/webapp/timesheet?query=" + (nextSunday.getMonth() + 1) 
+			+ "-" + nextSunday.getDate() + "-" + nextSunday.getFullYear());	
+
+	// create 1 row in the table for each day of the week from sunday to saturday
+	for(var i=0; i<7; i++){
+                var day = new Date(sunday.getTime() + (i * (24 * 60 * 60 * 1000)));
+		addRow(day, today);	
+	}
+});
+
+function addRow(day, today){
+	var row = "<tr>";		
+	row = row + "<td>" + week[day.getDay()];
+	if(day.getTime() == today.getTime()){
+		row = row + " (today)";
+	}
+	row = row + "</td>";
+
+	row = row + "<td>" + month[day.getMonth()] + " " + day.getDate() + ", " + day.getFullYear() + "</td>";
+
+	row = row + "<td>0.0</td>";
+	row = row + "<td>Not Submitted</td>";
+	row = row + "</tr>";
+	// add the table row
+	$('#timesheet > tbody:last').append(row);
+}
 </script>

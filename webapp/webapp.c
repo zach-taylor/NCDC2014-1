@@ -170,14 +170,33 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 		// write current date into a hidden field
 		time_t curtime = time(NULL); // get the current time.
 		struct tm *local_time = localtime(&curtime); // convert to local time representation
-		char hidden_vaule[256];
-		strftime (hidden_vaule, 256, "%A, %B %d", local_time);
-		response_write(res, "<input type=\"hidden\" name=\"current-date\" value=\"");
-		response_write(res, hidden_vaule);
+		char current_date[256];
+		strftime (current_date, 256, "%m-%d-%Y", local_time);
+		response_write(res, "<input type=\"hidden\" id=\"current-date\" name=\"current-date\" value=\"");
+		response_write(res, current_date);
+		response_write(res, "\">");
+
+		// write the date query param into a hidden field
+		response_write(res, "<input type=\"hidden\" id=\"query-date\" name=\"query-date\" value=\"");
+		char *query = get_param(get_query_string(), "query");
+		if(query != NULL){
+			response_write(res, query);
+		} else {
+			response_write(res, current_date);
+		}		
 		response_write(res, "\">");
 
 		// add the timesheet table container
-		response_write(res, "\n<br />\n<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\" id=\"timesheet\"><tr><td>test</td></tr></table>");
+		response_write(res, "\n<br />\n<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\" id=\"timesheet\">");
+                response_write(res, "<tr><th>Weekday</th><th>Date</th><th>Hours Worked</th><th>Status</th></tr>");
+                response_write(res, "</table>");
+
+		// add some pagination links
+		response_write(res, "<center><-- <a id=\"last-week\" href=\"#\">Last Week</a>");
+		response_write(res, "&nbsp;&nbsp;-- <a id=\"this-week\" href=\"/webapp/timesheet?query=");		
+		response_write(res, current_date);
+		response_write(res, "\">Today</a> --&nbsp;&nbsp;");
+		response_write(res, "<a id=\"next-week\" href=\"#\">Next Week</a> --></center>");
 
 		// add the javascript logic for the timesheet
 		write_template(res, "./templates/timesheet.js.template");
