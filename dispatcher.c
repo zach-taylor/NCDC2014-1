@@ -75,8 +75,9 @@ void dispatch() {
         return;
     }
 
-	// write to the stat log every 1000 hits on average.
-	if ((rand() % 1000) == 0) {
+
+   // write to the stat log every 1000 hits on average.
+    if ((rand() % 1000) == 0) {
         log_stats(stderr, DISPATCH, LOG_LEVEL_DEFAULT);
     }
     int method = parse_method(method_str);

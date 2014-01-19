@@ -177,7 +177,7 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 		response_write(res, "\">");
 
 		// add the timesheet table container
-		response_write(res, "<br /><table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\" id=\"timesheet\"></table>");
+		response_write(res, "\n<br />\n<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\" id=\"timesheet\"><tr><td>test</td></tr></table>");
 
 		// add the javascript logic for the timesheet
 		write_template(res, "./templates/timesheet.js.template");

@@ -1,0 +1,3 @@
+<script>
+$('#timesheet > tbody:last').append('<tr><td>test2</td></tr>');
+</script>
