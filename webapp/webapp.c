@@ -193,6 +193,10 @@ START_HANDLER (default_handler, GET, "", res, 0, matches) {
 	response_add_header(res, "Location", "/webapp/login"); // redirect to login page
 } END_HANDLER
 
+void on_crash() {
+	dump_tables();
+}
+
 int main() {
 	HANDLE(timesheet_page_handler);
 	HANDLE(login_page_handler);
@@ -201,6 +205,7 @@ int main() {
 	HANDLE(create_user_page_handler);
 	HANDLE(create_user_action_handler);
 	HANDLE(default_handler);
+	set_crash_handler(on_crash);
     serve_forever();
     return 0;
 }

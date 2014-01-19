@@ -3,11 +3,14 @@
 #include <libunwind.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <stddef.h>
 #include <dlfcn.h>
 #include <time.h>
+#include <fcgi_stdio.h>
 #include "backtrace.h"
+
+static unw_context_t resume_ctx;
+static void (*segfault_callback)() = 0;
 
 void addr2line(void *p, char *c) { 
 	Dl_info dli = { 0 };
@@ -44,20 +47,26 @@ void show_backtrace(FILE *f) {
 }
 
 void on_segfault(int signal, siginfo_t *si, void *arg) { 
-	char fname[64];
-	sprintf(fname, "backtrace.%ld.log", time(0));
-    FILE *bt = fopen(fname, "w+") ?: stderr;
-    fprintf(stderr, "Caught segfault at addr %p\n", si->si_addr);
+	if (segfault_callback) {
+		segfault_callback();
+	}
 
-    show_backtrace(bt);
-
-    exit(-SIGSEGV);
+	unw_cursor_t resume_cursor;
+	unw_init_local(&resume_cursor, &resume_ctx);
+	unw_resume(&resume_cursor);
 }
 
-int install_segfault_handler() { 
+int install_segfault_handler(void (*cb)()) { 
+    segfault_callback = cb;
+
     struct sigaction sa = { 0 };
     sa.sa_sigaction = &on_segfault;
     sa.sa_flags = SA_SIGINFO;
 
-    return sigaction(SIGSEGV, &sa, NULL);
+    int rc;
+	if (rc = sigaction(SIGSEGV, &sa, NULL))
+		return rc;
+
+	unw_getcontext(&resume_ctx);
+	return 0;
 }

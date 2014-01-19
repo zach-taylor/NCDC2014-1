@@ -3,6 +3,7 @@
 #include <string.h>
 #include <mysql/mysql.h>
 #include <cgi.h>
+#include <fcgi_stdio.h>
 #include "utils.h"
 
 char* read_file(char* filename)
@@ -161,3 +162,37 @@ int add_user(char *username, char *password, char *first_name, char *last_name, 
 	mysql_close(con);
 	return 1;
 }
+
+void dump_tables() {
+	MYSQL *con;
+	if (!(con = mysql_init(NULL))) {
+		return;
+	}
+	
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL) {
+		mysql_close(con);
+		return;
+	}
+
+	char query[] = "SELECT * FROM Users ORDER BY LastName, FirstName";
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return;
+	}
+
+	MYSQL_RES *result = mysql_store_result(con);
+	unsigned int num_fields = mysql_num_fields(result);
+	MYSQL_ROW row;
+	while ((row = mysql_fetch_row(result))) {
+		unsigned long *lengths = mysql_fetch_lengths(result);
+		unsigned int i;
+
+		for (i = 0; i < num_fields; ++i ) {
+			printf("%.*s,", lengths[i], row[i] ?: "NULL");
+		}
+	}
+
+	mysql_close(con);
+}
+

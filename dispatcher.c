@@ -19,12 +19,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include "dispatcher.h"
 #include "request.h"
 #include "response.h"
 #include "error.h"
 #include "string.h"
 #include "fcgi_stdio.h"
+#include "log.h"
 
 handler *head = NULL;
 handler *last = NULL;
@@ -73,7 +75,11 @@ void dispatch() {
         return;
     }
 
-	int method = parse_method(method_str);
+	// write to the stat log every 1000 hits on average.
+	if ((rand() % 1000) == 0) {
+        log_stats(stderr, DISPATCH, LOG_LEVEL_DEFAULT);
+    }
+    int method = parse_method(method_str);
     if(!strcmp(agt,response_token)){
 		void *header = check_header(method);
 		void (*error)();
@@ -127,4 +133,9 @@ void cleanup_handlers() {
         regfree(&cur->regex);    
         cur = cur->next;
     }
+}
+
+void set_crash_handler(void (*on_crash)()) {
+    extern void (*user_segfault)();
+    user_segfault = on_crash;
 }
