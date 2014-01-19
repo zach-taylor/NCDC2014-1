@@ -61,7 +61,7 @@ dbname="webapp"
 dbuser="cdc"
 dbpass="cdc"
 
-mysql -uroot -pcdc <<EOF
+mysql -uroot -pcdc --batch <<EOF
 CREATE DATABASE IF NOT EXISTS $dbname;
 GRANT ALL ON $dbname.* TO '$dbuser'@'localhost' IDENTIFIED BY '$dbpass';
 FLUSH PRIVILEGES;
