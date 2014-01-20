@@ -138,7 +138,7 @@ char *get_last_name(char *username){
 }
 
 int is_admin(char *username){
-	return "Y" == get_field_for_username(username, "IsAdmin");
+	return strcmp("Y", get_field_for_username(username, "IsAdmin")) == 0;
 }
 
 // TODO: We should probably hash these passwords or something...
@@ -172,6 +172,34 @@ int add_user(char *username, char *password, char *first_name, char *last_name, 
 int add_entry(char *username, char *day, char *minutes_worked){
 	char query[1024];
 	sprintf(query, "INSERT INTO Entries (Username, Day, MinutesWorked, ApprovedBy) VALUES ('%s', '%s', '%s', 'Not Approved');", username, day, minutes_worked);
+	
+	MYSQL *con;
+	if (!(con = mysql_init(NULL))) {
+		return;
+	}
+	
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL) {
+		mysql_close(con);
+		return;
+	}
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return;
+	}
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return 0;
+	}
+
+	mysql_close(con);
+	return 1;
+}
+
+int approve_entry(char *username, char *day){
+	char query[1024];
+	sprintf(query, "UPDATE Entries SET ApprovedBy='Approved' WHERE Username='%s' AND Day='%s';", username, day);
 	
 	MYSQL *con;
 	if (!(con = mysql_init(NULL))) {

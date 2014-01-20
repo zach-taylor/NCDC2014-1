@@ -70,12 +70,12 @@ $(document).ready(function() {
 		// create 1 row in the table for each day of the week from sunday to saturday
 		for(var i=0; i<7; i++){
 		        var day = new Date(sunday.getTime() + (i * (24 * 60 * 60 * 1000)));
-			addRow(day, today, data);	
+			addRow(day, today, data, userOfInterest);	
 		}
 	});
 });
 
-function addRow(day, today, data){
+function addRow(day, today, data, userOfInterest){
 	var row = "<tr>";		
 	row = row + "<td>" + week[day.getDay()];
 	if(day.getTime() == today.getTime()){
@@ -92,7 +92,13 @@ function addRow(day, today, data){
 		if(day.getTime() == date.getTime()){
 			// database entry matches table entry
 			row = row + "<td>" + (data.entries[i].minutes/60.0).toFixed(2) + "</td>";
-			row = row + "<td>" + data.entries[i].approver + "</td>";
+			var isAdmin = $('#current-role').val() == "admin";
+			if(isAdmin && (data.entries[i].approver != "Approved")){
+				row = row + "<td><input type=\"button\" value=\"Approve\" onclick=\"document.location='/webapp/entry/approve?user=" 
+					+ userOfInterest + "&day=" + data.entries[i].day + "'\" /></td>";
+			} else {
+				row = row + "<td>" + data.entries[i].approver + "</td>";
+			}
 			entryPresent = true;
 			// if there are more than one entry ignore subsequent entries (database is corrupted then)
 			break;
@@ -101,7 +107,7 @@ function addRow(day, today, data){
 	
 	if(!entryPresent){
 		row = row + "<td>0.0</td>";
-		row = row + "<td>Not Approved</td>";
+		row = row + "<td>Not Submitted</td>";
 	}	
 	
 	row = row + "</tr>";

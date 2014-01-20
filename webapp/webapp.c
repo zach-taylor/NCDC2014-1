@@ -194,6 +194,15 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 		response_write(res, username);		
 		response_write(res, "\">");
 
+		// write the current user role into a hidden field
+		response_write(res, "<input type=\"hidden\" id=\"current-role\" name=\"current-role\" value=\"");
+		if(is_admin(username)){
+			response_write(res, "admin");	
+		} else {
+			response_write(res, "user");	
+		}		
+		response_write(res, "\">");
+
 		// add the timesheet table container
 		response_write(res, "\n<br />\n<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\" id=\"timesheet\">");
                 response_write(res, "<tr><th>Weekday</th><th>Date</th><th>Hours Worked</th><th>Status</th></tr>");
@@ -225,6 +234,26 @@ START_HANDLER (timesheet_content_handler, GET, "/entries.json", res, 0, matches)
 	char* start_date = get_param(query_string, "start");
 	char* end_date = get_param(query_string, "end");
 	render_entries_json(res, username, start_date, end_date);	
+} END_HANDLER
+
+// timesheet approve action
+START_HANDLER (timesheet_approve_handler, GET, "/entry/approve", res, 0, matches) {
+	response_add_header(res, "content-type", "text/html");
+	char* query_string = get_query_string();
+	char* day = get_param(query_string, "day");
+	char* user = get_param(query_string, "user");
+	response_add_header(res, "content-type", "text/html");
+	write_page_template_header(res);	
+	if(user != NULL && day != NULL){
+		if(approve_entry(user, day)){
+			response_write(res, "Success: Timesheet entry approved. Go <a href=\"/webapp/timesheet\">back</a> to timesheet.");
+		} else {
+			response_write(res, "Error: Could not approve timesheet entry.");
+		}
+	} else {
+		response_write(res, "Error: Could not approve timesheet entry.");	
+	}
+	write_page_template_footer(res);	
 } END_HANDLER
 
 // new timesheet content
@@ -331,6 +360,7 @@ int main() {
 	HANDLE(timesheet_content_handler);
 	HANDLE(entry_page_handler);
 	HANDLE(entry_action_handler);
+	HANDLE(timesheet_approve_handler);
 	HANDLE(admin_page_handler);
 	HANDLE(js_vars_page_handler);
 	HANDLE(default_handler);
