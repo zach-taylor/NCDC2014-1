@@ -9,12 +9,18 @@ This is the web app for the Spring 2014 ISU National Cyber Defense Competition. 
 * sudo apt-get install gcc 
 * sudo apt-get install build-essential
 * sudo apt-get install libfcgi-dev
-* sudo apt-get install cgilib
 * sudo apt-get install libunwind7-dev
 * sudo apt-get install liburiparser-dev
 * sudo apt-get install mysql-server
 * sudo apt-get install libmysqlclient-dev
 * sudo apt-get install lighttpd
+* http://www.infodrom.org/projects/cgilib (Note: Ubuntu repo install for cgilib appears to be broken)
+* &nbsp;&nbsp;&nbsp;&nbsp;wget http://www.infodrom.org/projects/cgilib/download/cgilib-0.7.tar.gz
+* &nbsp;&nbsp;&nbsp;&nbsp;tar -xvf cgilib-0.7.tar.gz
+* &nbsp;&nbsp;&nbsp;&nbsp;cd cgilib-0.7
+* &nbsp;&nbsp;&nbsp;&nbsp;./configure
+* &nbsp;&nbsp;&nbsp;&nbsp;make
+* &nbsp;&nbsp;&nbsp;&nbsp;sudo make install
 
 ## Setup
 * sudo ln -s /etc/lighttpd/conf-available/10-fastcgi.conf /etc/lighttpd/conf-enabled/10-fastcgi.conf
