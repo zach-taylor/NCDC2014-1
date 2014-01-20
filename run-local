@@ -44,7 +44,7 @@ compress.filetype           = ( "application/javascript", "text/css", "text/html
 
 include_shell "/usr/share/lighttpd/create-mime.assign.pl"
 
-\$HTTP["url"] !~ "^/robots.txt$|^/favicon.ico$|^/static" {
+\$HTTP["url"] !~ "^/robots.txt$|^/favicon.ico$|^/static|^/~" {
   fastcgi.server = ( 
 	"/webapp" => ((
 		"bin-path" => "$RUNDIR/webapp",
