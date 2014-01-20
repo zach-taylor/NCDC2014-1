@@ -162,6 +162,16 @@ START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches
 // https://www.youtube.com/watch?v=L5l9lSnNMxg
 START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 	char *username = get_session_username();
+	
+
+	if(username != NULL){
+		error_handler("Username: ");
+		error_handler(username);
+	} else {
+		error_handler("null");
+	}
+	return;
+
 	if(username != NULL && is_authenticated()){
 		response_add_header(res, "content-type", "text/html");
 		write_page_template_header(res);
