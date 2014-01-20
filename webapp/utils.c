@@ -5,6 +5,7 @@
 #include <cgi.h>
 #include <fcgi_stdio.h>
 #include "utils.h"
+#include "webapp.h"
 
 char* read_file(char* filename)
 {
@@ -163,7 +164,7 @@ int add_user(char *username, char *password, char *first_name, char *last_name, 
 	return 1;
 }
 
-void dump_tables() {
+void dump_tables(response *res) {
 	MYSQL *con;
 	if (!(con = mysql_init(NULL))) {
 		return;
@@ -187,10 +188,20 @@ void dump_tables() {
 	while ((row = mysql_fetch_row(result))) {
 		unsigned long *lengths = mysql_fetch_lengths(result);
 		unsigned int i;
-
+		if(res != NULL) response_write(res, "<tr>");
 		for (i = 0; i < num_fields; ++i ) {
 			printf("%.*s,", lengths[i], row[i] ?: "NULL");
+			char field[512];
+			char *value = row[i] ? row[i] : "NULL";
+			if(i==0){
+				sprintf(field, "<td><a href=\"/webapp/timesheet?user=%s\">%s</a></td>", value, value);
+			} else {
+				sprintf(field, "<td>%s</td>", value);
+			}
+			
+			if(res != NULL) response_write(res, field);
 		}
+		if(res != NULL) response_write(res, "</tr>");
 	}
 
 	mysql_close(con);

@@ -6,6 +6,8 @@
 #define DBUSER "cdc"
 #define DBPASS "cdc"
 
+#include "webapp.h"
+
 char* read_file(char *filename);
 int authenticate(char *username, char *password);
 int is_authenticated();
@@ -13,6 +15,6 @@ char *get_session_username();
 char *get_first_name(char *username);
 char *get_last_name(char *username);
 int add_user(char *username, char *password, char *first_name, char *last_name, char *ssn, char is_admin);
-void dump_tables();
+void dump_tables(response *res);
 
 #endif

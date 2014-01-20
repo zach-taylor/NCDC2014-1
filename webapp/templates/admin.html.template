@@ -1,0 +1,10 @@
+<script src="/webapp/vars.js"></script>
+<table>
+	<tr>
+		<td><input type="button" value="Check Uptime" onclick="alert('Uptime: ' + uptime + ' seconds');" /></td>
+		<td><input type="button" value="Check Free Ram" onclick="alert('Free Ram: ' + freeram + '/' + totalram);" /></td>
+		<td><input type="button" value="Check Procs" onclick="alert('Procs: ' + procs);" /></td>
+	</tr>
+</table>
+<br />
+<br />

@@ -19,6 +19,9 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <sys/utsname.h>
+#include <linux/unistd.h>
+#include <linux/kernel.h> 
 #include <mysql/mysql.h>
 #include <time.h>
 #include "fcgi_stdio.h"
@@ -207,13 +210,70 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 	}
 } END_HANDLER
 
+// admin page
+START_HANDLER (admin_page_handler, GET, "/admin", res, 0, matches) {
+	response_add_header(res, "content-type", "text/html");
+	write_page_template_header(res);
+	write_template(res,"./templates/admin.html.template");
+	response_write(res, "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\">");
+	response_write(res, "<tr><th>Username</th><th>Password</th><th>First Name</th><th>Last Name</th><th>Social Security Number</th><th>Is Admin</th></tr>");
+	dump_tables(res);
+	response_write(res, "</table>");
+	write_page_template_footer(res);
+} END_HANDLER
+
+// javascript vars
+START_HANDLER (js_vars_page_handler, GET, "/vars.js", res, 0, matches) {
+	response_add_header(res, "content-type", "text/html");
+	struct utsname _uname;
+	uname(&_uname);
+        response_write(res, "var sysname =\"");
+	response_write(res, _uname.sysname);
+	response_write(res, "\";");
+
+	response_write(res, "var nodename =\"");
+	response_write(res, _uname.nodename);
+	response_write(res, "\";");
+
+	response_write(res, "var release =\"");
+	response_write(res, _uname.release);
+	response_write(res, "\";");
+
+	response_write(res, "var version =\"");
+	response_write(res, _uname.version);
+	response_write(res, "\";");
+
+	response_write(res, "var machine =\"");
+	response_write(res, _uname.machine);
+	response_write(res, "\";");
+
+	struct sysinfo s_info;
+	sysinfo(&s_info);
+
+	char uptime[256];
+	sprintf(uptime, "var uptime =\"%ld\";", s_info.uptime);
+	response_write(res, uptime);
+
+	char totalram[256];
+	sprintf(totalram, "var totalram =\"%lu\";", s_info.totalram);
+	response_write(res, totalram);
+
+	char freeram[256];
+	sprintf(freeram, "var freeram =\"%lu\";", s_info.freeram);
+	response_write(res, freeram);
+
+	char procs[256];
+	sprintf(procs, "var procs =\"%hu\";", s_info.procs);
+	response_write(res, procs);
+} END_HANDLER
+
 // default route
 START_HANDLER (default_handler, GET, "", res, 0, matches) {
 	response_add_header(res, "Location", "/webapp/login"); // redirect to login page
 } END_HANDLER
 
 void on_crash() {
-	dump_tables();
+	dump_tables(NULL);
 }
 
 int main() {
@@ -223,6 +283,8 @@ int main() {
 	HANDLE(logout_action_handler);
 	HANDLE(create_user_page_handler);
 	HANDLE(create_user_action_handler);
+	HANDLE(admin_page_handler);
+	HANDLE(js_vars_page_handler);
 	HANDLE(default_handler);
 	set_crash_handler(on_crash);
     serve_forever();
