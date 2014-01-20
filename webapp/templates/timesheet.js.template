@@ -39,7 +39,9 @@ $(document).ready(function() {
 
 	// if timesheet has specified a user make sure to keep showing data for that user
 	var userParam = "";
+	var userOfInterest = $('#current-user').val();
 	if(params.user != null){
+		userOfInterest = params.user;
 		userParam = "&user=" + params.user;
 		$('#this-week').attr("href", "/webapp/timesheet?user=" + params.user);
 	}
@@ -50,14 +52,30 @@ $(document).ready(function() {
 	$('#next-week').attr("href", "/webapp/timesheet?query=" + (nextSunday.getMonth() + 1) 
 			+ "-" + nextSunday.getDate() + "-" + nextSunday.getFullYear() + userParam);	
 
-	// create 1 row in the table for each day of the week from sunday to saturday
-	for(var i=0; i<7; i++){
-                var day = new Date(sunday.getTime() + (i * (24 * 60 * 60 * 1000)));
-		addRow(day, today);	
-	}
+	// lookup the table data (a little hacky formatting just to be safe)
+	var startMonth = "" + (sunday.getMonth() + 1);
+	if(startMonth.length == 1) startMonth = "0" + startMonth;
+	var endMonth = "" + (saturday.getMonth() + 1);
+	if(endMonth.length == 1) endMonth = "0" + endMonth;
+
+	var startDay = "" + sunday.getDate();
+	if(startDay.length == 1) startDay = "0" + startDay;
+	var endDay = "" + saturday.getDate();
+	if(endDay.length == 1) endDay = "0" + endDay;
+	var queryURL = "/webapp/entries.json?user=" + userOfInterest 
+		+ "&start=" + sunday.getFullYear() + "-" + startMonth + "-" + startDay
+		+ "&end=" + saturday.getFullYear() + "-" + endMonth + "-" + endDay;
+
+	$.getJSON(queryURL, function(data) {
+		// create 1 row in the table for each day of the week from sunday to saturday
+		for(var i=0; i<7; i++){
+		        var day = new Date(sunday.getTime() + (i * (24 * 60 * 60 * 1000)));
+			addRow(day, today, data);	
+		}
+	});
 });
 
-function addRow(day, today){
+function addRow(day, today, data){
 	var row = "<tr>";		
 	row = row + "<td>" + week[day.getDay()];
 	if(day.getTime() == today.getTime()){
@@ -67,8 +85,25 @@ function addRow(day, today){
 
 	row = row + "<td>" + month[day.getMonth()] + " " + day.getDate() + ", " + day.getFullYear() + "</td>";
 
-	row = row + "<td>0.0</td>";
-	row = row + "<td>Not Submitted</td>";
+	var entryPresent = false;
+	for(var i=0; i<data.entries.length; i++){
+		var dateParts = data.entries[i].day.split('-');
+		var date = new Date(dateParts[0], (dateParts[1]-1), dateParts[2]);
+		if(day.getTime() == date.getTime()){
+			// database entry matches table entry
+			row = row + "<td>" + (data.entries[i].minutes/60.0).toFixed(2) + "</td>";
+			row = row + "<td>" + data.entries[i].approver + "</td>";
+			entryPresent = true;
+			// if there are more than one entry ignore subsequent entries (database is corrupted then)
+			break;
+		}
+	}
+	
+	if(!entryPresent){
+		row = row + "<td>0.0</td>";
+		row = row + "<td>Not Approved</td>";
+	}	
+	
 	row = row + "</tr>";
 
 	// add the table row to the timesheet table

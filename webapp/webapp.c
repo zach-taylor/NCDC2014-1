@@ -189,6 +189,11 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 		}		
 		response_write(res, "\">");
 
+		// write the current username into a hidden field
+		response_write(res, "<input type=\"hidden\" id=\"current-user\" name=\"current-user\" value=\"");
+		response_write(res, username);		
+		response_write(res, "\">");
+
 		// add the timesheet table container
 		response_write(res, "\n<br />\n<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\" id=\"timesheet\">");
                 response_write(res, "<tr><th>Weekday</th><th>Date</th><th>Hours Worked</th><th>Status</th></tr>");
@@ -216,14 +221,10 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 START_HANDLER (timesheet_content_handler, GET, "/entries.json", res, 0, matches) {
 	response_add_header(res, "content-type", "text/html");
 	char* query_string = get_query_string();
+	char* username = get_param(query_string, "user");
 	char* start_date = get_param(query_string, "start");
 	char* end_date = get_param(query_string, "end");
-	if(start_date != NULL && end_date != NULL){
-		char query[512]; 
-		sprintf(query, "SELECT * from table where date_column between '%s' and '%s'", start_date, end_date);
-	} else {
-		// todo	
-	}	
+	render_entries_json(res, username, start_date, end_date);	
 } END_HANDLER
 
 // new timesheet content

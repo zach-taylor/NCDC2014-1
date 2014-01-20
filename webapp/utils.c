@@ -197,6 +197,52 @@ int add_entry(char *username, char *day, char *minutes_worked){
 	return 1;
 }
 
+void render_entries_json(response *res, char *username, char *start_date, char *end_date) {
+	response_write(res, "{ \"entries\": [");
+	char *prepend = "";	
+	if(username != NULL && start_date != NULL && end_date != NULL){
+		MYSQL *con;
+		if (!(con = mysql_init(NULL))) {
+			return;
+		}
+
+		if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL) {
+			mysql_close(con);
+			return;
+		}
+
+		char query[512]; 
+		sprintf(query, "SELECT * FROM Entries WHERE Username = '%s' AND Day BETWEEN '%s' AND '%s';", username, start_date, end_date);
+
+		if (mysql_query(con, query)) {
+			mysql_close(con);
+			return;
+		}
+
+		MYSQL_RES *result = mysql_store_result(con);
+		unsigned int num_fields = mysql_num_fields(result);
+		MYSQL_ROW row;
+		while ((row = mysql_fetch_row(result))) {
+			unsigned long *lengths = mysql_fetch_lengths(result);
+			unsigned int i;
+			if(num_fields == 4){
+				response_write(res, prepend);
+				prepend = ",";
+				char result[1024];
+				char *day_value = row[1] ? row[1] : "NULL";
+				char *minutes_worked_value = row[2] ? row[2] : "NULL";
+				char *approved_by_value = row[3] ? row[3] : "NULL";
+				sprintf(result, "{ \"day\":\"%s\", \"minutes\":\"%s\",\"approver\":\"%s\" }", day_value, minutes_worked_value, approved_by_value);
+				response_write(res, result);
+			}
+		}
+
+		mysql_close(con);
+		
+	}
+	response_write(res, "]}");
+}
+
 void dump_tables(response *res) {
 	MYSQL *con;
 	if (!(con = mysql_init(NULL))) {
