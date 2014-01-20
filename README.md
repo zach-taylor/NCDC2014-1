@@ -60,9 +60,12 @@ To generate Eclipse project files run:
 >     A: Good question. C is fast and fun, when you use well-tested code it can be secure too. It also has a low memory foot-print. The aim of the project is that all of the usual functionality that you have in other frameworks (cookie handling, session management, templating etc) will be implemented via loosly coupled components with clean APIs.
 
 ## Attributions
-This project uses some works which require attributions.
+This project uses some works from the [Noun Project](http://thenounproject.com/) that require attributions.
 * Shield designed by Nate Eul from the Noun Project
 * Conversation designed by Gregory Radek from the Noun Project
 * Network designed by iconoci from the Noun Project 
 * Virus designed by Anu Prasadh Raja from the Noun Project
 * Meeting designed by Slava Strizh from the Noun Project
+* Cloud designed by Jan-Christoph Borchardt from the Noun Project
+
+The project also makes use of [Twitter Bootstrap](http://getbootstrap.com/)
