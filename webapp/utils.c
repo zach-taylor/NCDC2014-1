@@ -137,6 +137,10 @@ char *get_last_name(char *username){
 	return get_field_for_username(username, "LastName");
 }
 
+int is_admin(char *username){
+	return "Y" == get_field_for_username(username, "IsAdmin");
+}
+
 // TODO: We should probably hash these passwords or something...
 // Source: https://www.youtube.com/watch?v=8ZtInClXe1Q
 int add_user(char *username, char *password, char *first_name, char *last_name, char *ssn, char is_admin) {
@@ -154,6 +158,35 @@ int add_user(char *username, char *password, char *first_name, char *last_name, 
 	// using a prepared statement for security
 	char query[1024];
 	sprintf(query, "INSERT INTO Users (Username, Password, FirstName, LastName, SSN, IsAdmin) VALUES ('%s','%s','%s','%s', '%s', '%c');", username, password, first_name, last_name, ssn, is_admin);
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return 0;
+	}
+
+	mysql_close(con);
+	return 1;
+}
+
+// day should be in format yyyy-mm-dd
+int add_entry(char *username, char *day, char *minutes_worked){
+	char query[1024];
+	sprintf(query, "INSERT INTO Entries (Username, Day, MinutesWorked, ApprovedBy) VALUES ('%s', '%s', '%s', 'Not Approved');", username, day, minutes_worked);
+	
+	MYSQL *con;
+	if (!(con = mysql_init(NULL))) {
+		return;
+	}
+	
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL) {
+		mysql_close(con);
+		return;
+	}
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return;
+	}
 
 	if (mysql_query(con, query)) {
 		mysql_close(con);

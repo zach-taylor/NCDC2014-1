@@ -2,6 +2,24 @@
 var week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 var month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];	
 
+function getSearchParameters() {
+      var prmstr = window.location.search.substr(1);
+      return prmstr != null && prmstr != "" ? transformToAssocArray(prmstr) : {};
+}
+
+function transformToAssocArray(prmstr) {
+    var params = {};
+    var prmarr = prmstr.split("&");
+    for ( var i = 0; i < prmarr.length; i++) {
+        var tmparr = prmarr[i].split("=");
+        params[tmparr[0]] = tmparr[1];
+    }
+    return params;
+}
+
+// shamelessly stolen from http://stackoverflow.com/a/5448635/475329
+var params = getSearchParameters();
+
 $(document).ready(function() {
  	// clear out the table, except the header
 	$('#timesheet > tbody:last').find('tr:gt(0)').remove();
@@ -19,11 +37,18 @@ $(document).ready(function() {
 	var lastSunday = new Date(sunday.getTime() - (7 * (24 * 60 * 60 * 1000)));
 	var nextSunday = new Date(sunday.getTime() + (7 * (24 * 60 * 60 * 1000)));
 
+	// if timesheet has specified a user make sure to keep showing data for that user
+	var userParam = "";
+	if(params.user != null){
+		userParam = "&user=" + params.user;
+		$('#this-week').attr("href", "/webapp/timesheet?user=" + params.user);
+	}
+
 	// update the next and last week link targets
 	$('#last-week').attr("href", "/webapp/timesheet?query=" + (lastSunday.getMonth() + 1) 
-			+ "-" + lastSunday.getDate() + "-" + lastSunday.getFullYear());
+			+ "-" + lastSunday.getDate() + "-" + lastSunday.getFullYear() + userParam);
 	$('#next-week').attr("href", "/webapp/timesheet?query=" + (nextSunday.getMonth() + 1) 
-			+ "-" + nextSunday.getDate() + "-" + nextSunday.getFullYear());	
+			+ "-" + nextSunday.getDate() + "-" + nextSunday.getFullYear() + userParam);	
 
 	// create 1 row in the table for each day of the week from sunday to saturday
 	for(var i=0; i<7; i++){
@@ -45,7 +70,8 @@ function addRow(day, today){
 	row = row + "<td>0.0</td>";
 	row = row + "<td>Not Submitted</td>";
 	row = row + "</tr>";
-	// add the table row
+
+	// add the table row to the timesheet table
 	$('#timesheet > tbody:last').append(row);
 }
 </script>

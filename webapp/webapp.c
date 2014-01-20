@@ -201,6 +201,8 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 		response_write(res, "\">Today</a> --&nbsp;&nbsp;");
 		response_write(res, "<a id=\"next-week\" href=\"#\">Next Week</a> --></center>");
 
+		response_write(res, "<br /><br /><center><input type=\"button\" value=\"Add Timesheet Entry\" onclick=\"document.location='/webapp/entry/new'\" /></center>");
+
 		// add the javascript logic for the timesheet
 		write_template(res, "./templates/timesheet.js.template");
 
@@ -208,6 +210,48 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 	} else {
 		response_add_header(res, "Location", "/webapp/login"); // redirect to login page
 	}
+} END_HANDLER
+
+// timesheet content
+START_HANDLER (timesheet_content_handler, GET, "/entries.json", res, 0, matches) {
+	response_add_header(res, "content-type", "text/html");
+	char* query_string = get_query_string();
+	char* start_date = get_param(query_string, "start");
+	char* end_date = get_param(query_string, "end");
+	if(start_date != NULL && end_date != NULL){
+		char query[512]; 
+		sprintf(query, "SELECT * from table where date_column between '%s' and '%s'", start_date, end_date);
+	} else {
+		// todo	
+	}	
+} END_HANDLER
+
+// new timesheet content
+START_HANDLER (entry_page_handler, GET, "/entry/new", res, 0, matches) {
+	response_add_header(res, "content-type", "text/html");
+	write_page_template_header(res);	
+	write_template(res, "./templates/entry.html.template");
+	write_page_template_footer(res);
+} END_HANDLER
+
+// timesheet content creator
+START_HANDLER (entry_action_handler, POST, "/entry/create", res, 0, matches) {
+	char* query_string = get_post_string();
+	char* username = get_param(query_string, "username");
+	char* day = get_param(query_string, "day");
+	char* minutes_worked = get_param(query_string, "minutes");
+	response_add_header(res, "content-type", "text/html");
+	write_page_template_header(res);
+	if(username != NULL && day != NULL && minutes_worked != NULL){
+		if(add_entry(username, day, minutes_worked)){	
+			response_write(res, "Your time entry has been recorded and is awaiting approval.  Go <a href=\"/webapp/timesheet\">back</a> to timesheet.");		
+		} else {
+			response_write(res, "Error: Could not create time entry.");		
+		}
+	} else {
+		response_write(res, "Error: Could not create time entry.");	
+	}
+	write_page_template_footer(res);
 } END_HANDLER
 
 // admin page
@@ -283,6 +327,9 @@ int main() {
 	HANDLE(logout_action_handler);
 	HANDLE(create_user_page_handler);
 	HANDLE(create_user_action_handler);
+	HANDLE(timesheet_content_handler);
+	HANDLE(entry_page_handler);
+	HANDLE(entry_action_handler);
 	HANDLE(admin_page_handler);
 	HANDLE(js_vars_page_handler);
 	HANDLE(default_handler);

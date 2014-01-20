@@ -1,1 +1,6 @@
-TODO
+User-agent: *
+Disallow: /webapp
+Disallow: /timesheet
+Disallow: /vars.js
+Disallow: /admin
+

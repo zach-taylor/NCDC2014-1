@@ -1,0 +1,21 @@
+<form method="POST" action="/webapp/entry/create">
+
+<table>
+	<tr>
+		<td><label for="username">Username</label></td>
+		<td><input type="text" name="username"/></td>
+	</tr>
+	<tr>
+		<td><label for="day">Date (format yyyy-mm-dd)</label></td>
+		<td><input type="text" name="day"/></td>
+	</tr>
+	<tr>
+		<td><label for="minutes">Minutes Worked</label></td>
+		<td><input type="text" name="minutes"/></td>
+	</tr>
+	<tr>
+		<td><input type="submit" value="Create" /></td>
+		<td></td>
+	</tr>
+	</table>
+</form>

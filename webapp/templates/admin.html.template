@@ -3,7 +3,8 @@
 	<tr>
 		<td><input type="button" value="Check Uptime" onclick="alert('Uptime: ' + uptime + ' seconds');" /></td>
 		<td><input type="button" value="Check Free Ram" onclick="alert('Free Ram: ' + freeram + '/' + totalram);" /></td>
-		<td><input type="button" value="Check Procs" onclick="alert('Procs: ' + procs);" /></td>
+		<td><input type="button" value="Check Processes" onclick="alert('Processes: ' + procs);" /></td>
+		<td><input type="button" value="Add User" onclick="document.location='/webapp/user/new'" /></td>
 	</tr>
 </table>
 <br />
