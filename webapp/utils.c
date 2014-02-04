@@ -6,6 +6,7 @@
 #include <fcgi_stdio.h>
 #include "utils.h"
 #include "webapp.h"
+#include "constants.h"
 
 char* read_file(char* filename)
 {
@@ -66,15 +67,19 @@ int authenticate(char *username, char *password) {
 
 	// prepared statement to select username
 	char query[1024];
-	sprintf(query, "SELECT Password FROM Users WHERE Username='%s';", username);
-
+	//sprintf(query, "SELECT Password FROM Users WHERE Username='%s';", username);
+	
+	sprintf(query, "SELECT * FROM Users WHERE Username='%s' AND Password=SHA(CONCAT('%s','%s'));", username, password, SALT);
+	
 	if (mysql_query(con, query)) {
 		mysql_close(con);
 		return 0;
 	}
 
 	int result = 0;
+	
 	MYSQL_RES *users = mysql_store_result(con);
+	/*
 	if (users != NULL) {
 		int num_users = mysql_num_fields(users);
 		if(num_users > 0){
@@ -87,7 +92,15 @@ int authenticate(char *username, char *password) {
 		} // else user does not exist
 		mysql_free_result(users);
 	}
+	*/
 
+	if(users != NULL) {
+		int num_users = mysql_num_fields(users);
+		if(num_users > 0) {
+			result = 1;
+		}
+		mysql_free_result(users);
+	}
 	mysql_close(con);
 	return result;
 }
@@ -157,7 +170,7 @@ int add_user(char *username, char *password, char *first_name, char *last_name, 
 
 	// using a prepared statement for security
 	char query[1024];
-	sprintf(query, "INSERT INTO Users (Username, Password, FirstName, LastName, SSN, IsAdmin) VALUES ('%s','%s','%s','%s', '%s', '%c');", username, password, first_name, last_name, ssn, is_admin);
+	sprintf(query, "INSERT INTO Users (Username, Password, FirstName, LastName, SSN, IsAdmin) VALUES ('%s', SHA1(CONCAT('%s','%s')),'%s', '%s', '%s', '%c');", username, password, SALT, first_name, last_name, ssn, is_admin);
 
 	if (mysql_query(con, query)) {
 		mysql_close(con);
