@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "webapp.h"
 #include "constants.h"
+#include "logger.h"
 
 char* read_file(char* filename)
 {
@@ -53,7 +54,7 @@ char *get_session_username(){
 
 int authenticate(char *username, char *password) {
 	MYSQL *con = mysql_init(NULL);
-
+	logs("authenticate func");
 	if (con == NULL){
 		return 0;
 	}
