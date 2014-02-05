@@ -298,10 +298,10 @@ START_HANDLER (admin_page_handler, GET, "/admin", res, 0, matches) {
 
 // javascript vars
 START_HANDLER (js_vars_page_handler, GET, "/vars.js", res, 0, matches) {
-	response_add_header(res, "content-type", "text/html");
+	response_add_header(res, "content-type", "application/javascript");
 	struct utsname _uname;
 	uname(&_uname);
-        response_write(res, "var sysname =\"");
+  response_write(res, "var sysname =\"");
 	response_write(res, _uname.sysname);
 	response_write(res, "\";");
 
