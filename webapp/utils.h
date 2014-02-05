@@ -1,11 +1,6 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#define DBHOST "localhost"
-#define DBNAME "webapp"
-#define DBUSER "cdc"
-#define DBPASS "cdc"
-
 #include "webapp.h"
 
 char* read_file(char *filename);
