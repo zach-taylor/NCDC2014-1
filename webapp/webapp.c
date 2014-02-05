@@ -228,7 +228,7 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 
 // timesheet content
 START_HANDLER (timesheet_content_handler, GET, "/entries.json", res, 0, matches) {
-	response_add_header(res, "content-type", "text/html");
+	response_add_header(res, "content-type", "application/json");
 	char* query_string = get_query_string();
 	char* username = get_param(query_string, "user");
 	char* start_date = get_param(query_string, "start");
