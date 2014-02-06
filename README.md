@@ -1,6 +1,6 @@
-# ISU NCDC 2014 WebApp
+# Team 1 ISU NCDC 2014 WebApp
 
-This is the web app for the Spring 2014 ISU National Cyber Defense Competition.  It is designed to be intentionally insecure and should not be used in any production system.
+This is Team 1's web app for the Spring 2014 ISU National Cyber Defense Competition.  It is designed to be intentionally insecure, and while having some code security audits, should not be used in any production system.
 
 ## Prereqs
 * Developed and tested on Ubuntu 12.04 LTS
@@ -13,18 +13,19 @@ This is the web app for the Spring 2014 ISU National Cyber Defense Competition. 
 * sudo apt-get install liburiparser-dev
 * sudo apt-get install mysql-server
 * sudo apt-get install libmysqlclient-dev
-* sudo apt-get install lighttpd
 * sudo apt-get install cgilib
+* sudo apt-get install apache2
 
 ## Setup
-* sudo ln -s /etc/lighttpd/conf-available/10-fastcgi.conf /etc/lighttpd/conf-enabled/10-fastcgi.conf
+* Add "ScriptAlias /webapp /usr/lib/cgi-bin/webapp" to /etc/apache2/conf-available/webapp.conf
+* sudo a2enconf webapp.conf
 
 ## Development
 * sudo apt-get install git-core
-* git clone https://github.com/benjholla/NCDC2014.git
+* git clone https://github.com/zach-taylor/NCDC2014.git
 * cd NCDC2014
-* ./run-local
-* Go to [http://localhost:8080/](http://localhost:8080/)
+* ./deploynew
+* Go to [http://localhost/](http://localhost/)
 
 ### Recommended IDE is Eclipse for C/C++
 [http://www.eclipse.org/downloads/packages/eclipse-ide-cc-developers/keplersr1](http://www.eclipse.org/downloads/packages/eclipse-ide-cc-developers/keplersr1)
@@ -40,11 +41,6 @@ To generate Eclipse project files run:
 * cd build
 * cmake -G"Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug ../
 * Inside Eclipse, File->Import->General->Existing Projects into Workspace
-
-## Deployment
-* cd NCDC2014
-* ./deploy
-* Go to [http://localhost/](http://localhost/)
 
 ## Framework Background
 > This project is built on Raphters, a web framework for C based on the rapht architectural pattern (see RAPHT).

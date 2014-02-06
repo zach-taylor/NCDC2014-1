@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This deploys the webapp to Apache
+# CAUTION: This script deletes everything in the /var/www/ directory. Ensure you have nothing in this directory before deploying.
+
 set -e
 (
 	mkdir -p build
