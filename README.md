@@ -3,7 +3,7 @@
 This is Team 1's web app for the Spring 2014 ISU National Cyber Defense Competition.  It is designed to be intentionally insecure, and while having some code security audits, should not be used in any production system.
 
 ## Prereqs
-* Developed and tested on Ubuntu 12.04 LTS
+* Developed and tested on Ubuntu 13.10
 * sudo apt-get update
 * sudo apt-get install cmake
 * sudo apt-get install gcc 
