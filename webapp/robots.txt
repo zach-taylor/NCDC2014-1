@@ -1,6 +1,3 @@
 User-agent: *
-Disallow: /webapp
-Disallow: /timesheet
-Disallow: /vars.js
-Disallow: /admin
-
+Disallow: /tempdir
+Disallow: /admindashboard
