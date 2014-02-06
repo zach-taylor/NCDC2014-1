@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -e
+(
+	mkdir -p build
+	cd build
+        cmake -DCMAKE_BUILD_TYPE=Release ../
+	make
+
+	sudo service apache2 stop
+
+	if [[ -d /usr/lib/cgi-bin/templates ]]; then
+	  sudo rm -rf /usr/lib/cgi-bin/templates
+	fi
+
+	sudo rm -rf /var/www/*
+
+	sudo cp webapp /usr/lib/cgi-bin/webapp
+	sudo mkdir -p /usr/lib/cgi-bin/templates
+	sudo cp -r ../webapp/templates/* /usr/lib/cgi-bin/templates
+	sudo cp -r ../webapp/static/* /var/www
+	sudo cp ../webapp/robots.txt /var/www/robots.txt
+
+	sudo service apache2 start
+
+	dbname="webapp"
+	dbuser="cdc"
+	dbpass="cdc"
+	MYSQL=`which mysql`
+
+	Q1="CREATE DATABASE IF NOT EXISTS $dbname;"
+	Q2="GRANT ALL ON $dbname.* TO '$dbuser'@'localhost' IDENTIFIED BY '$dbpass';"
+	Q3="FLUSH PRIVILEGES;"
+	Q4="USE $dbname;"
+	Q5="CREATE TABLE IF NOT EXISTS Users(Username VARCHAR(255), Password VARCHAR(255), LastName VARCHAR(255), FirstName VARCHAR(255), SSN VARCHAR(11), IsAdmin CHAR(1));"
+	Q6="CREATE TABLE IF NOT EXISTS Entries(Username VARCHAR(255), Day DATE, MinutesWorked INT, ApprovedBy VARCHAR(255));"
+
+	$MYSQL -uroot -pcdc -e "${Q1}${Q2}${Q3}${Q4}${Q5}${Q6}"
+)

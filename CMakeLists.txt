@@ -35,4 +35,4 @@ ADD_EXECUTABLE(webapp ${WebAppSources})
 TARGET_LINK_LIBRARIES(webapp cgi mysqlclient raphters_static uriparser fcgi unwind dl)
 
 # finally need to make binary executable after build process
-execute_process(COMMAND sudo chmod +s webapp)
+#execute_process(COMMAND sudo chmod +s webapp)
