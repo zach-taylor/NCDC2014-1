@@ -119,52 +119,59 @@ START_HANDLER (create_user_page_handler, GET, "/user/new", res, 0, matches) {
 
 // add user action
 START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches) {
-	char* post_data = get_post_string();
-
-	char* username = get_param(post_data, "username");
-	if(username == NULL){
-		username = "";
-	}
-
-	char* password = get_param(post_data, "password");
-	if(password == NULL){
-		password = "";
-	}
-
-	char* first_name = get_param(post_data, "first_name");
-	if(first_name == NULL){
-		first_name = "";
-	}
-
-	char* last_name = get_param(post_data, "last_name");
-	if(last_name == NULL){
-		last_name = "";
-	}
-
-	char* ssn = get_param(post_data, "ssn");
-	if(ssn == NULL){
-		ssn = "";
-	}
-
-	char set_admin = '0';
-	char* administrator = get_param(post_data, "administrator");
-	if(administrator != NULL){
-		if(strcmp(administrator, "yes") == 0){
-			set_admin = '1';
+	if(is_authenticated() && is_admin()){
+		char* post_data = get_post_string();
+	
+		char* username = get_param(post_data, "username");
+		if(username == NULL){
+			username = "";
 		}
-	}
-
-	response_add_header(res, "Content-Type", "text/html");
-	write_page_template_header(res);
-
-	if(add_user(username, password, first_name, last_name, ssn, set_admin)){
-		response_write(res, "Success! Created ");
-		response_write(res, username);
+	
+		char* password = get_param(post_data, "password");
+		if(password == NULL){
+			password = "";
+		}
+	
+		char* first_name = get_param(post_data, "first_name");
+		if(first_name == NULL){
+			first_name = "";
+		}
+	
+		char* last_name = get_param(post_data, "last_name");
+		if(last_name == NULL){
+			last_name = "";
+		}
+	
+		char* ssn = get_param(post_data, "ssn");
+		if(ssn == NULL){
+			ssn = "";
+		}
+	
+		char set_admin = '0';
+		char* administrator = get_param(post_data, "administrator");
+		if(administrator != NULL){
+			if(strcmp(administrator, "yes") == 0){
+				set_admin = '1';
+			}
+		}
+	
+		response_add_header(res, "Content-Type", "text/html");
+		write_page_template_header(res);
+	
+		if(add_user(username, password, first_name, last_name, ssn, set_admin)){
+			response_write(res, "Success! Created ");
+			response_write(res, username);
+		} else {
+			response_write(res, "Could not create user.");
+		}
+	
+		write_page_template_footer(res);
 	} else {
-		response_write(res, "Could not create user.");
+		response_add_header(res, "Content-Type", "text/html");
+		write_page_template_header(res);
+		response_write(res, "Permission denied");
+		write_page_template_footer(res);
 	}
-
-	write_page_template_footer(res);
 
 } END_HANDLER
 
@@ -294,59 +301,44 @@ START_HANDLER (entry_action_handler, POST, "/entry/create", res, 0, matches) {
 
 // admin page
 START_HANDLER (admin_page_handler, GET, "/admin", res, 0, matches) {
-	response_add_header(res, "Content-Type", "text/html");
-	write_page_template_header(res);
-	write_template(res,"./templates/admin.html.template");
-	response_write(res, "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\">");
-	response_write(res, "<tr><th>Username</th><th>Password</th><th>First Name</th><th>Last Name</th><th>Social Security Number</th><th>Is Admin</th></tr>");
-	dump_tables(res);
-	response_write(res, "</table>");
-	write_page_template_footer(res);
+	if(is_authenticated() && is_admin()){
+		response_add_header(res, "Content-Type", "text/html");
+		write_page_template_header(res);
+		write_template(res,"./templates/admin.html.template");
+		response_write(res, "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\">");
+		response_write(res, "<tr><th>Username</th><th>Password</th><th>First Name</th><th>Last Name</th><th>Social Security Number</th><th>Is Admin</th></tr>");
+		dump_tables(res);
+		response_write(res, "</table>");
+		write_page_template_footer(res);
+	} else {
+		response_add_header(res, "Content-Type", "text/html");
+		write_page_template_header(res);
+		response_write(res, "Permission denied");
+		write_page_template_footer(res);
+	}
 } END_HANDLER
 
 // javascript vars
 START_HANDLER (js_vars_page_handler, GET, "/vars.js", res, 0, matches) {
 	response_add_header(res, "Content-Type", "application/javascript");
-	struct utsname _uname;
-	uname(&_uname);
-  response_write(res, "var sysname =\"");
-	response_write(res, _uname.sysname);
-	response_write(res, "\";");
+	
+  response_write(res, "var sysname =\"Linux\";");
 
-	response_write(res, "var nodename =\"");
-	response_write(res, _uname.nodename);
-	response_write(res, "\";");
+	response_write(res, "var nodename =\"www\";");
+	
+	response_write(res, "var release =\"3.11.0-15-generic\";");
 
-	response_write(res, "var release =\"");
-	response_write(res, _uname.release);
-	response_write(res, "\";");
+	response_write(res, "var version =\"#25-Ubuntu SMP Thu Jan 30 17:22:01 UTC 2014\";");
 
-	response_write(res, "var version =\"");
-	response_write(res, _uname.version);
-	response_write(res, "\";");
+	response_write(res, "var machine =\"x86\";");
 
-	response_write(res, "var machine =\"");
-	response_write(res, _uname.machine);
-	response_write(res, "\";");
+	response_write(res, "var uptime =\"8630\";");
 
-	struct sysinfo s_info;
-	sysinfo(&s_info);
+	response_write(res, "var totalram =\"42698240\";");
 
-	char uptime[256];
-	sprintf(uptime, "var uptime =\"%ld\";", s_info.uptime);
-	response_write(res, uptime);
+	response_write(res, "var freeram =\"2222976\";");
 
-	char totalram[256];
-	sprintf(totalram, "var totalram =\"%lu\";", s_info.totalram);
-	response_write(res, totalram);
-
-	char freeram[256];
-	sprintf(freeram, "var freeram =\"%lu\";", s_info.freeram);
-	response_write(res, freeram);
-
-	char procs[256];
-	sprintf(procs, "var procs =\"%hu\";", s_info.procs);
-	response_write(res, procs);
+	response_write(res, "var procs =\"110\";");
 } END_HANDLER
 
 // default route
