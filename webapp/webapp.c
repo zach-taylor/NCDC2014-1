@@ -119,7 +119,7 @@ START_HANDLER (create_user_page_handler, GET, "/user/new", res, 0, matches) {
 
 // add user action
 START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches) {
-	if(is_authenticated() && is_admin()){
+	if(is_authenticated() && is_admin(get_session_username())){
 		char* post_data = get_post_string();
 	
 		char* username = get_param(post_data, "username");
