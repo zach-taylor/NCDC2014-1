@@ -38,5 +38,5 @@ set -e
 	Q5="CREATE TABLE IF NOT EXISTS Users(Username VARCHAR(255), Password VARCHAR(255), LastName VARCHAR(255), FirstName VARCHAR(255), SSN VARCHAR(11), IsAdmin CHAR(1));"
 	Q6="CREATE TABLE IF NOT EXISTS Entries(Username VARCHAR(255), Day DATE, MinutesWorked INT, ApprovedBy VARCHAR(255));"
 	Q7="CREATE TABLE IF NOT EXISTS Sessions(Username VARCHAR(255), SessionID VARCHAR(255), LastUse DATETIME);"
-	$MYSQL -uroot -p -e "${Q1}${Q2}${Q3}${Q4}${Q5}${Q6}"
+	$MYSQL -uroot -p -e "${Q1}${Q2}${Q3}${Q4}${Q5}${Q6}${Q7}"
 )

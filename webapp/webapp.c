@@ -28,6 +28,7 @@
 #include "raphters.h"
 #include "webapp.h"
 #include "utils.h"
+#include "logger.h"
 
 void write_template(response *res, char *template) {
 	const char *content = read_file(template);
@@ -80,7 +81,7 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 
 	if(authenticate(username,password)){
 		char *sid = randstring(32);
-		if(add_session(username, sid){
+		if(add_session(username, sid)){
 			char username_cookie[1024];
 			sprintf(username_cookie, "id=%s; path=/webapp/; max-age=604800; HttpOnly;", sid);
 			response_add_header(res, "Set-Cookie", username_cookie);

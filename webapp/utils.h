@@ -9,7 +9,7 @@ int authenticate(char *username, char *password);
 int is_authenticated();
 char *get_session_username();
 char *get_field_for_session(char *sessionid, char *field);
-char *get_field_for_username(char *username, char *field)
+char *get_field_for_username(char *username, char *field);
 char *get_first_name(char *username);
 char *get_last_name(char *username);
 int is_admin(char *username);
