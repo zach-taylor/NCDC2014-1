@@ -60,7 +60,7 @@ void write_logout_link(response *res, char *username){
 
 // login page
 START_HANDLER (login_page_handler, GET, "/login", res, 0, matches) {
-	response_add_header(res, "content-type", "text/html");
+	response_add_header(res, "Content-Type", "text/html");
 	write_template(res, "./templates/login.html.template");
 } END_HANDLER
 
@@ -79,13 +79,20 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 	}
 
 	if(authenticate(username,password)){
-		char username_cookie[1024];
-		sprintf(username_cookie, "Username=%s; path=/; max-age=604800;", username);
-		response_add_header(res, "Set-Cookie", username_cookie);
-		response_add_header(res, "Set-Cookie", "Authenticated=yes; path=/; max-age=604800;");
-		response_add_header(res, "Location", "/webapp/timesheet");
+		char *sid = randstring(32);
+		if(add_session(username, sid){
+			char username_cookie[1024];
+			sprintf(username_cookie, "id=%s; path=/webapp/; max-age=604800; HttpOnly;", sid);
+			response_add_header(res, "Set-Cookie", username_cookie);
+			response_add_header(res, "Location", "/webapp/timesheet");
+		} else {
+			response_add_header(res, "Content-Type", "text/html");
+			write_page_template_header(res);
+			response_write(res, "Username or password is incorrect.");
+			write_page_template_footer(res);
+		}
 	} else {
-		response_add_header(res, "content-type", "text/html");
+		response_add_header(res, "Content-Type", "text/html");
 		write_page_template_header(res);
 		response_write(res, "Username or password is incorrect.");
 		write_page_template_footer(res);
@@ -96,8 +103,8 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 // logout action
 START_HANDLER (logout_action_handler, GET, "/logout", res, 0, matches) {
 	// expire session
-	response_add_header(res, "Set-Cookie", "Authenticated=no; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
-	response_add_header(res, "Set-Cookie", "Username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
+	// destroy_session(username)
+	response_add_header(res, "Set-Cookie", "id=; path=/webapp/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
 	response_add_header(res, "Location", "/webapp/login");
 } END_HANDLER
 
@@ -166,7 +173,7 @@ START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches
 START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 	char *username = get_session_username();
 	if(username != NULL && is_authenticated()){
-		response_add_header(res, "content-type", "text/html");
+		response_add_header(res, "Content-Type", "text/html");
 		write_page_template_header(res);
 		write_logout_link(res, username);
 
@@ -191,15 +198,15 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 
 		// write the current username into a hidden field
 		response_write(res, "<input type=\"hidden\" id=\"current-user\" name=\"current-user\" value=\"");
-		response_write(res, username);		
+		response_write(res, username);
 		response_write(res, "\">");
 
 		// write the current user role into a hidden field
 		response_write(res, "<input type=\"hidden\" id=\"current-role\" name=\"current-role\" value=\"");
 		if(is_admin(username)){
-			response_write(res, "admin");	
+			response_write(res, "admin");
 		} else {
-			response_write(res, "user");	
+			response_write(res, "user");
 		}		
 		response_write(res, "\">");
 
@@ -228,7 +235,7 @@ START_HANDLER (timesheet_page_handler, GET, "/timesheet", res, 0, matches) {
 
 // timesheet content
 START_HANDLER (timesheet_content_handler, GET, "/entries.json", res, 0, matches) {
-	response_add_header(res, "content-type", "application/json");
+	response_add_header(res, "Content-Type", "application/json");
 	char* query_string = get_query_string();
 	char* username = get_param(query_string, "user");
 	char* start_date = get_param(query_string, "start");
@@ -238,11 +245,11 @@ START_HANDLER (timesheet_content_handler, GET, "/entries.json", res, 0, matches)
 
 // timesheet approve action
 START_HANDLER (timesheet_approve_handler, GET, "/entry/approve", res, 0, matches) {
-	response_add_header(res, "content-type", "text/html");
+	response_add_header(res, "Content-Type", "text/html");
 	char* query_string = get_query_string();
 	char* day = get_param(query_string, "day");
 	char* user = get_param(query_string, "user");
-	response_add_header(res, "content-type", "text/html");
+	response_add_header(res, "Content-Type", "text/html");
 	write_page_template_header(res);	
 	if(user != NULL && day != NULL){
 		if(approve_entry(user, day)){
@@ -258,7 +265,7 @@ START_HANDLER (timesheet_approve_handler, GET, "/entry/approve", res, 0, matches
 
 // new timesheet content
 START_HANDLER (entry_page_handler, GET, "/entry/new", res, 0, matches) {
-	response_add_header(res, "content-type", "text/html");
+	response_add_header(res, "Content-Type", "text/html");
 	write_page_template_header(res);	
 	write_template(res, "./templates/entry.html.template");
 	write_page_template_footer(res);
@@ -270,7 +277,7 @@ START_HANDLER (entry_action_handler, POST, "/entry/create", res, 0, matches) {
 	char* username = get_param(query_string, "username");
 	char* day = get_param(query_string, "day");
 	char* minutes_worked = get_param(query_string, "minutes");
-	response_add_header(res, "content-type", "text/html");
+	response_add_header(res, "Content-Type", "text/html");
 	write_page_template_header(res);
 	if(username != NULL && day != NULL && minutes_worked != NULL){
 		if(add_entry(username, day, minutes_worked)){	
@@ -286,7 +293,7 @@ START_HANDLER (entry_action_handler, POST, "/entry/create", res, 0, matches) {
 
 // admin page
 START_HANDLER (admin_page_handler, GET, "/admin", res, 0, matches) {
-	response_add_header(res, "content-type", "text/html");
+	response_add_header(res, "Content-Type", "text/html");
 	write_page_template_header(res);
 	write_template(res,"./templates/admin.html.template");
 	response_write(res, "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\">");
@@ -298,7 +305,7 @@ START_HANDLER (admin_page_handler, GET, "/admin", res, 0, matches) {
 
 // javascript vars
 START_HANDLER (js_vars_page_handler, GET, "/vars.js", res, 0, matches) {
-	response_add_header(res, "content-type", "application/javascript");
+	response_add_header(res, "Content-Type", "application/javascript");
 	struct utsname _uname;
 	uname(&_uname);
   response_write(res, "var sysname =\"");
