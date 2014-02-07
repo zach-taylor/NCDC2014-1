@@ -301,7 +301,7 @@ START_HANDLER (entry_action_handler, POST, "/entry/create", res, 0, matches) {
 
 // admin page
 START_HANDLER (admin_page_handler, GET, "/admin", res, 0, matches) {
-	if(is_authenticated() && is_admin()){
+	if(is_authenticated() && is_admin(get_session_username())){
 		response_add_header(res, "Content-Type", "text/html");
 		write_page_template_header(res);
 		write_template(res,"./templates/admin.html.template");
