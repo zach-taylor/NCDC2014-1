@@ -270,7 +270,7 @@ char *get_last_name(char *username){
 int is_admin(char *username){
 	char *isadmin = get_field_for_username(username, "IsAdmin");
 	char logstring[1024];
-	sprintf(logstring, "level=INFO, action=is_admin, username=\"%s\", value=%d", username, );
+	sprintf(logstring, "level=INFO, action=is_admin, username=\"%s\", value=%s", username, isadmin);
 }
 
 // Source: https://www.youtube.com/watch?v=8ZtInClXe1Q
@@ -288,7 +288,7 @@ int add_user(char *username, char *password, char *first_name, char *last_name, 
 
 	// using a prepared statement for security
 	char query[1024];
-	sprintf(query, "INSERT INTO Users (Username, Password, FirstName, LastName, SSN, IsAdmin) VALUES ('%s', SHA1(CONCAT('%s','%s')),'%s', '%s', '%s', '%c');", username, password, SALT, first_name, last_name, ssn, is_admin);
+	sprintf(query, "INSERT INTO Users (Username, Password, FirstName, LastName, SSN, IsAdmin, IsActive) VALUES ('%s', SHA(CONCAT('%s','%s')),'%s', '%s', '%s', '%c', '1');", username, password, SALT, first_name, last_name, ssn, is_admin);
 
 	if (mysql_query(con, query)) {
 		mysql_close(con);
@@ -314,7 +314,7 @@ int add_session(char *username, char *sessionid) {
 
 	// using a prepared statement for security
 	char query[1024];
-	sprintf(query, "INSERT INTO Sessions (Username, SessionID, LastUse, IsActive) VALUES ('%s','%s', NOW(), 1);", username, sessionid);
+	sprintf(query, "INSERT INTO Sessions (Username, SessionID, LastUse, IsActive) VALUES ('%s','%s', NOW(), '1');", username, sessionid);
 
 	if (mysql_query(con, query)) {
 		mysql_close(con);
@@ -325,31 +325,35 @@ int add_session(char *username, char *sessionid) {
 	return 1;
 }
 
-int disable_session(char *sessionid){
-	char query[1024];
-	sprintf(query, "UPDATE Sessions SET IsActive=0 WHERE SessionID='%s';", sessionid);
+int disable_session(){
+	s_cgi *cgi;
+	s_cookie *cookie;
+	cgi = cgiInit();
+	cookie = cgiGetCookie(cgi, "id");
+	if(cookie != NULL){
+		logs("cookie not null");
+		char query[1024];
+		sprintf(query, "UPDATE Sessions SET IsActive=0 WHERE SessionID='%s';", cookie->value);
 	
-	MYSQL *con;
-	if (!(con = mysql_init(NULL))) {
-		return;
-	}
+		MYSQL *con = mysql_init(NULL);
+		if (con == NULL) {
+			return 0;
+		}
 	
-	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL) {
-		mysql_close(con);
-		return;
-	}
+		if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL) {
+			mysql_close(con);
+			return 0;
+		}
 
-	if (mysql_query(con, query)) {
-		mysql_close(con);
-		return;
-	}
 
-	if (mysql_query(con, query)) {
-		mysql_close(con);
-		return 0;
-	}
+		if (mysql_query(con, query)) {
+			mysql_close(con);
+			return 0;
+		}
 
-	mysql_close(con);
+		mysql_close(con);
+	}
+	logs("cookie null");
 	return 1;
 }
 

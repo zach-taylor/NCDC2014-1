@@ -104,7 +104,7 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 // logout action
 START_HANDLER (logout_action_handler, GET, "/logout", res, 0, matches) {
 	// expire session
-	// destroy_session(username)
+	disable_session();
 	response_add_header(res, "Set-Cookie", "id=; path=/webapp/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
 	response_add_header(res, "Location", "/webapp/login");
 } END_HANDLER
@@ -146,11 +146,11 @@ START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches
 		ssn = "";
 	}
 
-	char set_admin = 0;
+	char set_admin = '0';
 	char* administrator = get_param(post_data, "administrator");
 	if(administrator != NULL){
 		if(strcmp(administrator, "yes") == 0){
-			set_admin = 1;
+			set_admin = '1';
 		}
 	}
 

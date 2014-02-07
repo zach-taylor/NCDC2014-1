@@ -13,6 +13,7 @@ char *get_field_for_username(char *username, char *field);
 char *get_first_name(char *username);
 char *get_last_name(char *username);
 int is_admin(char *username);
+int disable_session();
 int add_session(char *username, char *sessionid);
 int add_user(char *username, char *password, char *first_name, char *last_name, char *ssn, char is_admin);
 int add_entry(char *username, char *day, char *minutes_worked);
