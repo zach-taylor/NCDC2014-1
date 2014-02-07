@@ -83,7 +83,7 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 		char *sid = randstring(32);
 		if(add_session(username, sid)){
 			char username_cookie[1024];
-			sprintf(username_cookie, "id=%s; path=/webapp/; max-age=604800; HttpOnly;", sid);
+			sprintf(username_cookie, "sid=%s; path=/webapp/; max-age=604800; HttpOnly;", sid);
 			response_add_header(res, "Set-Cookie", username_cookie);
 			response_add_header(res, "Location", "/webapp/timesheet");
 		} else {
@@ -104,14 +104,14 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 // logout action
 START_HANDLER (logout_action_handler, GET, "/logout", res, 0, matches) {
 	// expire session
-	disable_session();
-	response_add_header(res, "Set-Cookie", "id=; path=/webapp/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
+	int result = disable_session();
+	response_add_header(res, "Set-Cookie", "sid=; path=/webapp/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
 	response_add_header(res, "Location", "/webapp/login");
 } END_HANDLER
 
 // add user page
 START_HANDLER (create_user_page_handler, GET, "/user/new", res, 0, matches) {
-	response_add_header(res, "content-type", "text/html");
+	response_add_header(res, "Content-Type", "text/html");
 	write_page_template_header(res);
 	write_template(res, "./templates/new_user.html.template");
 	write_page_template_footer(res);

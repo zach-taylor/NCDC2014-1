@@ -9,6 +9,8 @@
 #include "constants.h"
 #include "logger.h"
 
+s_cgi *cgi;
+
 char* read_file(char* filename)
 {
     FILE* file = fopen(filename,"r");
@@ -51,10 +53,10 @@ char *randstring(size_t length) {
 }
 
 int is_authenticated(){
-	s_cgi *cgi;
 	s_cookie *cookie;
-	cgi = cgiInit();
-	cookie = cgiGetCookie(cgi, "id");
+	if(cgi==NULL)
+		cgi = cgiInit();
+	cookie = cgiGetCookie(cgi, "sid");
 
 
 	MYSQL *con = mysql_init(NULL);
@@ -73,7 +75,7 @@ int is_authenticated(){
 
 	char query[1024];
 	if(cookie != NULL){
-		sprintf(query, "SELECT * FROM Sessions WHERE SessionID='%s' AND IsActive=1;", cookie->value);
+		sprintf(query, "SELECT * FROM Sessions WHERE SessionID='%s' AND IsActive=1;", cgiEscape(cookie->value));
 	} else {
 		logs("level=ERROR, action=is_authenticated, status=failed, message=\"cookie reference is null\"");
 		return 0;
@@ -113,15 +115,14 @@ int is_authenticated(){
 }
 
 char *get_session_username(){
-	s_cgi *cgi;
 	s_cookie *cookie;
-	cgi = cgiInit();
-	cookie = cgiGetCookie(cgi, "id");
+	if(cgi==NULL)
+		cgi = cgiInit();
+	cookie = cgiGetCookie(cgi, "sid");
 	if(cookie != NULL){
 		//return strdup(cookie->value);
 		return get_field_for_session(cookie->value, "Username");
 	}
-	
 	return NULL;
 }
 
@@ -326,15 +327,14 @@ int add_session(char *username, char *sessionid) {
 }
 
 int disable_session(){
-	s_cgi *cgi;
 	s_cookie *cookie;
-	cgi = cgiInit();
-	cookie = cgiGetCookie(cgi, "id");
+	if(cgi==NULL)
+		cgi = cgiInit();
+	cookie = cgiGetCookie(cgi, "sid");
 	if(cookie != NULL){
 		logs("cookie not null");
 		char query[1024];
 		sprintf(query, "UPDATE Sessions SET IsActive=0 WHERE SessionID='%s';", cookie->value);
-	
 		MYSQL *con = mysql_init(NULL);
 		if (con == NULL) {
 			return 0;
