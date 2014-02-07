@@ -73,7 +73,7 @@ int is_authenticated(){
 
 	char query[1024];
 	if(cookie != NULL){
-		sprintf(query, "SELECT * FROM Sessions WHERE SessionID='%s';", cookie->value);
+		sprintf(query, "SELECT * FROM Sessions WHERE SessionID='%s' AND IsActive=1;", cookie->value);
 	} else {
 		logs("level=ERROR, action=is_authenticated, status=failed, message=\"cookie reference is null\"");
 		return 0;
@@ -149,7 +149,7 @@ int authenticate(char *username, char *password) {
 	char query[1024];
 	//sprintf(query, "SELECT Password FROM Users WHERE Username='%s';", username);
 	
-	sprintf(query, "SELECT Username FROM Users WHERE Username='%s' AND Password=SHA(CONCAT('%s','%s'));", username, password, SALT);
+	sprintf(query, "SELECT Username FROM Users WHERE Username='%s' AND Password=SHA(CONCAT('%s','%s')) AND IsActive=1;", username, password, SALT);
 	
 	if (mysql_query(con, query)) {
 		mysql_close(con);
@@ -268,7 +268,9 @@ char *get_last_name(char *username){
 }
 
 int is_admin(char *username){
-	return strcmp("Y", get_field_for_username(username, "IsAdmin")) == 0;
+	char *isadmin = get_field_for_username(username, "IsAdmin");
+	char logstring[1024];
+	sprintf(logstring, "level=INFO, action=is_admin, username=\"%s\", value=%d", username, );
 }
 
 // Source: https://www.youtube.com/watch?v=8ZtInClXe1Q
@@ -312,7 +314,35 @@ int add_session(char *username, char *sessionid) {
 
 	// using a prepared statement for security
 	char query[1024];
-	sprintf(query, "INSERT INTO Sessions (Username, SessionID, LastUse) VALUES ('%s','%s', NOW());", username, sessionid);
+	sprintf(query, "INSERT INTO Sessions (Username, SessionID, LastUse, IsActive) VALUES ('%s','%s', NOW(), 1);", username, sessionid);
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return 0;
+	}
+
+	mysql_close(con);
+	return 1;
+}
+
+int disable_session(char *sessionid){
+	char query[1024];
+	sprintf(query, "UPDATE Sessions SET IsActive=0 WHERE SessionID='%s';", sessionid);
+	
+	MYSQL *con;
+	if (!(con = mysql_init(NULL))) {
+		return;
+	}
+	
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL) {
+		mysql_close(con);
+		return;
+	}
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return;
+	}
 
 	if (mysql_query(con, query)) {
 		mysql_close(con);

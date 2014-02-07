@@ -146,15 +146,15 @@ START_HANDLER (create_user_action_handler, POST, "/user/create", res, 0, matches
 		ssn = "";
 	}
 
-	char set_admin = 'N';
+	char set_admin = 0;
 	char* administrator = get_param(post_data, "administrator");
 	if(administrator != NULL){
 		if(strcmp(administrator, "yes") == 0){
-			set_admin = 'Y';
+			set_admin = 1;
 		}
 	}
 
-	response_add_header(res, "content-type", "text/html");
+	response_add_header(res, "Content-Type", "text/html");
 	write_page_template_header(res);
 
 	if(add_user(username, password, first_name, last_name, ssn, set_admin)){
