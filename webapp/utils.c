@@ -32,20 +32,72 @@ int is_authenticated(){
 	s_cgi *cgi;
 	s_cookie *cookie;
 	cgi = cgiInit();
-	cookie = cgiGetCookie(cgi, "Authenticated");
+	cookie = cgiGetCookie(cgi, "id");
+
+
+	MYSQL *con = mysql_init(NULL);
+	logs("level=INFO, action=is_authenticated, status=started");
+	
+	if (con == NULL){
+		logs("level=FATAL, action=is_authenticated, status=failed, message=\"database connection is null\"");
+		return 0;
+	}
+
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL){
+                mysql_close(con);
+		logs("level=FATAL, action=is_authenticated, status=failed, message=\"database connection failed\"");
+                return 0;
+        }
+
+	char query[1024];
+	if(cookie != NULL){
+		sprintf(query, "SELECT * FROM Sessions WHERE SessionID='%s';", cookie->value);
+	} else {
+		logs("level=ERROR, action=is_authenticated, status=failed, message=\"cookie reference is null\");
+		return 0;
+	}
+	
+	if (mysql_real_query(con, query, strlen(query))) {
+		mysql_close(con);
+		logs("level=FATAL, action=is_authenticated, status=failed, message=\"database query failed\"");
+		return 0;
+	}
+
+	int result = 0;
+        
+        MYSQL_RES *sessions = mysql_store_result(con);
+
+	if(sessions != NULL) {
+                int num_sessions = mysql_num_fields(sessions);
+                if(num_sessions > 0) {
+                        result = 1;
+			char logstring[255];
+			sprintf(logstring, "level=INFO, action=is_authenticated, status=succeeded, username=\"'%s'\"", username);
+                	logs(logstring);
+			//MYSQL_ROW row = 
+		} else {
+			logs("level=INFO, action=is_authenticated, status=failed");
+                }
+		mysql_free_result(sessions);
+        }
+        mysql_close(con);
+        return result;
+	
+	/*
 	if(cookie != NULL){
 		if(strcmp(cookie->value,"yes") == 0){
 			return 1;
 		}
 	}
 	return 0;
+	*/
 }
 
 char *get_session_username(){
 	s_cgi *cgi;
 	s_cookie *cookie;
 	cgi = cgiInit();
-	cookie = cgiGetCookie(cgi, "Username");
+	cookie = cgiGetCookie(cgi, "id");
 	if(cookie != NULL){
 		return strdup(cookie->value);
 	}
@@ -155,7 +207,6 @@ int is_admin(char *username){
 	return strcmp("Y", get_field_for_username(username, "IsAdmin")) == 0;
 }
 
-// TODO: We should probably hash these passwords or something...
 // Source: https://www.youtube.com/watch?v=8ZtInClXe1Q
 int add_user(char *username, char *password, char *first_name, char *last_name, char *ssn, char is_admin) {
 	MYSQL *con = mysql_init(NULL);
