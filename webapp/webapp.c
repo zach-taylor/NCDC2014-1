@@ -301,12 +301,12 @@ START_HANDLER (entry_action_handler, POST, "/entry/create", res, 0, matches) {
 
 // admin page
 START_HANDLER (admin_page_handler, GET, "/admin", res, 0, matches) {
-	if(is_authenticated() && is_admin(get_session_username())){
+	if(is_authenticated()){
 		response_add_header(res, "Content-Type", "text/html");
 		write_page_template_header(res);
 		write_template(res,"./templates/admin.html.template");
 		response_write(res, "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered\">");
-		response_write(res, "<tr><th>Username</th><th>Password</th><th>First Name</th><th>Last Name</th><th>Social Security Number</th><th>Is Admin</th></tr>");
+		response_write(res, "<tr><th>Username</th><th>First Name</th><th>Last Name</th><th>Social Security Number</th><th>Is Admin</th></tr>");
 		dump_tables(res);
 		response_write(res, "</table>");
 		write_page_template_footer(res);

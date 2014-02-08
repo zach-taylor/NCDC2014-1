@@ -9,7 +9,7 @@
 #include "constants.h"
 #include "logger.h"
 
-s_cgi *cgi;
+static s_cgi *cgi;
 
 char* read_file(char* filename)
 {
@@ -75,7 +75,7 @@ int is_authenticated(){
 
 	char query[1024];
 	if(cookie != NULL){
-		sprintf(query, "SELECT * FROM Sessions WHERE SessionID='%s' AND IsActive=1;", cgiEscape(cookie->value));
+		sprintf(query, "SELECT * FROM Sessions WHERE SessionID='%s';", cgiEscape(cookie->value));
 	} else {
 		logs("level=ERROR, action=is_authenticated, status=failed, message=\"cookie reference is null\"");
 		return 0;
@@ -121,7 +121,9 @@ char *get_session_username(){
 	cookie = cgiGetCookie(cgi, "sid");
 	if(cookie != NULL){
 		//return strdup(cookie->value);
+		logs("cookie not null");
 		return get_field_for_session(cookie->value, "Username");
+		
 	}
 	return NULL;
 }
@@ -150,7 +152,7 @@ int authenticate(char *username, char *password) {
 	char query[1024];
 	//sprintf(query, "SELECT Password FROM Users WHERE Username='%s';", username);
 	
-	sprintf(query, "SELECT Username FROM Users WHERE Username='%s' AND Password=SHA(CONCAT('%s','%s')) AND IsActive=1;", username, password, SALT);
+	sprintf(query, "SELECT Username FROM Users WHERE Username='%s' AND Password=SHA(CONCAT('%s','%s'));", username, password, SALT);
 	
 	if (mysql_query(con, query)) {
 		mysql_close(con);
@@ -272,6 +274,7 @@ int is_admin(char *username){
 	char *isadmin = get_field_for_username(username, "IsAdmin");
 	char logstring[1024];
 	sprintf(logstring, "level=INFO, action=is_admin, username=\"%s\", value=%s", username, isadmin);
+	logs(logstring);
 }
 
 // Source: https://www.youtube.com/watch?v=8ZtInClXe1Q
@@ -471,7 +474,7 @@ void dump_tables(response *res) {
 		return;
 	}
 
-	char query[] = "SELECT * FROM Users ORDER BY LastName, FirstName";
+	char query[] = "SELECT Username, LastName, FirstName, SSN, IsAdmin FROM Users ORDER BY LastName, FirstName";
 
 	if (mysql_query(con, query)) {
 		mysql_close(con);
