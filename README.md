@@ -1,5 +1,10 @@
 # ISU NCDC 2014 WebApp
 
+<a href="https://scan.coverity.com/projects/1311">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/1311/badge.svg"/>
+</a>
+
 This is the web app for the Spring 2014 ISU National Cyber Defense Competition.  It is designed to be intentionally insecure and should not be used in any production system.
 
 ## Prereqs
