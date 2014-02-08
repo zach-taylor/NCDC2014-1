@@ -1,20 +1,20 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#define DBHOST "localhost"
-#define DBNAME "webapp"
-#define DBUSER "cdc"
-#define DBPASS "cdc"
-
 #include "webapp.h"
 
 char* read_file(char *filename);
+char *randstring(size_t length);
 int authenticate(char *username, char *password);
 int is_authenticated();
 char *get_session_username();
+char *get_field_for_session(char *sessionid, char *field);
+char *get_field_for_username(char *username, char *field);
 char *get_first_name(char *username);
 char *get_last_name(char *username);
 int is_admin(char *username);
+int disable_session();
+int add_session(char *username, char *sessionid);
 int add_user(char *username, char *password, char *first_name, char *last_name, char *ssn, char is_admin);
 int add_entry(char *username, char *day, char *minutes_worked);
 int approve_entry(char *username, char *day);

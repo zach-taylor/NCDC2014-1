@@ -6,6 +6,10 @@
 #include <fcgi_stdio.h>
 #include "utils.h"
 #include "webapp.h"
+#include "constants.h"
+#include "logger.h"
+
+static s_cgi *cgi;
 
 char* read_file(char* filename)
 {
@@ -26,39 +30,119 @@ char* read_file(char* filename)
     return content;
 }
 
+char *randstring(size_t length) {
+
+    static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";        
+    char *randomString = NULL;
+
+    if (length) {
+        randomString = malloc(sizeof(char) * (length +1));
+
+        if (randomString) {
+	    int n;
+            for (n = 0;n < length;n++) {
+                int key = rand() % (int)(sizeof(charset) -1);
+                randomString[n] = charset[key];
+            }
+
+            randomString[length] = '\0';
+        }
+    }
+
+    return randomString;
+}
+
 int is_authenticated(){
-	s_cgi *cgi;
 	s_cookie *cookie;
-	cgi = cgiInit();
-	cookie = cgiGetCookie(cgi, "Authenticated");
+	if(cgi==NULL)
+		cgi = cgiInit();
+	cookie = cgiGetCookie(cgi, "sid");
+
+
+	MYSQL *con = mysql_init(NULL);
+	logs("level=INFO, action=is_authenticated, status=started");
+	
+	if (con == NULL){
+		logs("level=FATAL, action=is_authenticated, status=failed, message=\"database connection is null\"");
+		return 0;
+	}
+
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL){
+    mysql_close(con);
+		logs("level=FATAL, action=is_authenticated, status=failed, message=\"database connection failed\"");
+    return 0;
+  }
+
+	char query[1024];
+	if(cookie != NULL){
+		sprintf(query, "SELECT * FROM Sessions WHERE SessionID='%s';", cgiEscape(cookie->value));
+	} else {
+		logs("level=ERROR, action=is_authenticated, status=failed, message=\"cookie reference is null\"");
+		return 0;
+	}
+	
+	if(mysql_real_query(con, query, strlen(query))) {
+		mysql_close(con);
+		logs("level=FATAL, action=is_authenticated, status=failed, message=\"database query failed\"");
+		return 0;
+	}
+
+	int result = 0;
+        
+  MYSQL_RES *sessions = mysql_store_result(con);
+
+	if(sessions != NULL) {
+		int num_sessions = mysql_num_rows(sessions);
+		if(num_sessions > 0) {
+      result = 1;
+			logs("level=INFO, action=is_authenticated, status=succeeded");
+		} else {
+			logs("level=INFO, action=is_authenticated, status=failed");
+    }
+		mysql_free_result(sessions);
+  }
+  mysql_close(con);
+  return result;
+	
+	/*
 	if(cookie != NULL){
 		if(strcmp(cookie->value,"yes") == 0){
 			return 1;
 		}
 	}
 	return 0;
+	*/
 }
 
 char *get_session_username(){
-	s_cgi *cgi;
 	s_cookie *cookie;
-	cgi = cgiInit();
-	cookie = cgiGetCookie(cgi, "Username");
+	if(cgi==NULL)
+		cgi = cgiInit();
+	cookie = cgiGetCookie(cgi, "sid");
 	if(cookie != NULL){
-		return strdup(cookie->value);
+		//return strdup(cookie->value);
+		logs("cookie not null");
+		return get_field_for_session(cookie->value, "Username");
+		
 	}
 	return NULL;
 }
 
+// just checks if the username and password are correct
 int authenticate(char *username, char *password) {
 	MYSQL *con = mysql_init(NULL);
-
+	
+	// log auth attempt
+	char logstring[1024];
+	sprintf(logstring, "level=INFO, action=authenticate, user=\"%s\"", username);
+	logs(logstring);
+	
 	if (con == NULL){
 		return 0;
 	}
 
-        // use the real functions
-        // https://www.youtube.com/watch?v=_jKylhJtPmI
+  // use the real functions
+  // https://www.youtube.com/watch?v=_jKylhJtPmI
 	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL){
 		mysql_close(con);
 		return 0;
@@ -66,15 +150,19 @@ int authenticate(char *username, char *password) {
 
 	// prepared statement to select username
 	char query[1024];
-	sprintf(query, "SELECT Password FROM Users WHERE Username='%s';", username);
-
+	//sprintf(query, "SELECT Password FROM Users WHERE Username='%s';", username);
+	
+	sprintf(query, "SELECT Username FROM Users WHERE Username='%s' AND Password=SHA(CONCAT('%s','%s'));", username, password, SALT);
+	
 	if (mysql_query(con, query)) {
 		mysql_close(con);
 		return 0;
 	}
 
 	int result = 0;
+	
 	MYSQL_RES *users = mysql_store_result(con);
+	/*
 	if (users != NULL) {
 		int num_users = mysql_num_fields(users);
 		if(num_users > 0){
@@ -87,9 +175,54 @@ int authenticate(char *username, char *password) {
 		} // else user does not exist
 		mysql_free_result(users);
 	}
+	*/
 
+	if(users != NULL) {
+		int num_users = mysql_num_fields(users);
+		if(num_users > 0) {
+			return 1;
+		}
+		mysql_free_result(users);
+	}
 	mysql_close(con);
 	return result;
+}
+
+char *get_field_for_session(char *sessionid, char *field){
+	MYSQL *con = mysql_init(NULL);
+
+	if (con == NULL){
+		return 0;
+	}
+
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL){
+		mysql_close(con);
+		return 0;
+	}
+
+	char query[1024];
+	sprintf(query, "SELECT %s FROM Sessions WHERE SessionID='%s';", field, sessionid);
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return 0;
+	}
+
+	MYSQL_RES *sessions = mysql_store_result(con);
+	if (sessions != NULL) {
+		int num_sessions = mysql_num_fields(sessions);
+		if(num_sessions > 0){
+			MYSQL_ROW row = mysql_fetch_row(sessions);
+			if(row != NULL){
+				mysql_close(con);
+				return row[0];
+			} // shouldn't happen...I don't think
+		} // else user does not exist
+		mysql_free_result(sessions);
+	}
+
+	mysql_close(con);
+	return NULL;
 }
 
 char *get_field_for_username(char *username, char *field){
@@ -138,10 +271,12 @@ char *get_last_name(char *username){
 }
 
 int is_admin(char *username){
-	return strcmp("Y", get_field_for_username(username, "IsAdmin")) == 0;
+	char *isadmin = get_field_for_username(username, "IsAdmin");
+	char logstring[1024];
+	sprintf(logstring, "level=INFO, action=is_admin, username=\"%s\", value=%s", username, isadmin);
+	logs(logstring);
 }
 
-// TODO: We should probably hash these passwords or something...
 // Source: https://www.youtube.com/watch?v=8ZtInClXe1Q
 int add_user(char *username, char *password, char *first_name, char *last_name, char *ssn, char is_admin) {
 	MYSQL *con = mysql_init(NULL);
@@ -157,7 +292,7 @@ int add_user(char *username, char *password, char *first_name, char *last_name, 
 
 	// using a prepared statement for security
 	char query[1024];
-	sprintf(query, "INSERT INTO Users (Username, Password, FirstName, LastName, SSN, IsAdmin) VALUES ('%s','%s','%s','%s', '%s', '%c');", username, password, first_name, last_name, ssn, is_admin);
+	sprintf(query, "INSERT INTO Users (Username, Password, FirstName, LastName, SSN, IsAdmin, IsActive) VALUES ('%s', SHA(CONCAT('%s','%s')),'%s', '%s', '%s', '%c', '1');", username, password, SALT, first_name, last_name, ssn, is_admin);
 
 	if (mysql_query(con, query)) {
 		mysql_close(con);
@@ -165,6 +300,63 @@ int add_user(char *username, char *password, char *first_name, char *last_name, 
 	}
 
 	mysql_close(con);
+	return 1;
+}
+
+// Source: https://www.youtube.com/watch?v=8ZtInClXe1Q
+int add_session(char *username, char *sessionid) {
+	MYSQL *con = mysql_init(NULL);
+
+	if (con == NULL){
+		return 0;
+	}
+
+	if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL){
+		mysql_close(con);
+		return 0;
+	}
+
+	// using a prepared statement for security
+	char query[1024];
+	sprintf(query, "INSERT INTO Sessions (Username, SessionID, LastUse, IsActive) VALUES ('%s','%s', NOW(), '1');", username, sessionid);
+
+	if (mysql_query(con, query)) {
+		mysql_close(con);
+		return 0;
+	}
+
+	mysql_close(con);
+	return 1;
+}
+
+int disable_session(){
+	s_cookie *cookie;
+	if(cgi==NULL)
+		cgi = cgiInit();
+	cookie = cgiGetCookie(cgi, "sid");
+	if(cookie != NULL){
+		logs("cookie not null");
+		char query[1024];
+		sprintf(query, "UPDATE Sessions SET IsActive=0 WHERE SessionID='%s';", cookie->value);
+		MYSQL *con = mysql_init(NULL);
+		if (con == NULL) {
+			return 0;
+		}
+	
+		if (mysql_real_connect(con, DBHOST, DBUSER, DBPASS, DBNAME, 0, NULL, CLIENT_MULTI_STATEMENTS) == NULL) {
+			mysql_close(con);
+			return 0;
+		}
+
+
+		if (mysql_query(con, query)) {
+			mysql_close(con);
+			return 0;
+		}
+
+		mysql_close(con);
+	}
+	logs("cookie null");
 	return 1;
 }
 
@@ -282,7 +474,7 @@ void dump_tables(response *res) {
 		return;
 	}
 
-	char query[] = "SELECT * FROM Users ORDER BY LastName, FirstName";
+	char query[] = "SELECT Username, LastName, FirstName, SSN, IsAdmin FROM Users ORDER BY LastName, FirstName";
 
 	if (mysql_query(con, query)) {
 		mysql_close(con);
