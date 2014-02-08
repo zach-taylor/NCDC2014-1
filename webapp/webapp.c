@@ -83,7 +83,7 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 		char *sid = randstring(32);
 		if(add_session(username, sid)){
 			char username_cookie[1024];
-			sprintf(username_cookie, "sid=%s; path=/webapp/; max-age=604800; HttpOnly;", sid);
+			sprintf(username_cookie, "sid=%s; path=/webapp/; max-age=604800; HttpOnly; secure", sid);
 			response_add_header(res, "Set-Cookie", username_cookie);
 			response_add_header(res, "Location", "/webapp/timesheet");
 		} else {
@@ -105,7 +105,7 @@ START_HANDLER (login_action_handler, POST, "/login", res, 0, matches) {
 START_HANDLER (logout_action_handler, GET, "/logout", res, 0, matches) {
 	// expire session
 	int result = disable_session();
-	response_add_header(res, "Set-Cookie", "sid=; path=/webapp/; expires=Thu, 01 Jan 1970 00:00:00 GMT;");
+	response_add_header(res, "Set-Cookie", "sid=; path=/webapp/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly");
 	response_add_header(res, "Location", "/webapp/login");
 } END_HANDLER
 
